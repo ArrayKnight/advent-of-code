@@ -76,7 +76,7 @@ export default (dense: number[]) => {
 				expanded[index + j] = expanded[file.index + j];
 				expanded[file.index + j] = { size: 0, index: file.index };
 			} else {
-				expanded[index + j] = { size, index: index + file.size };
+				expanded[index + j] = { size: delta, index: index + file.size };
 			}
 		}
 
