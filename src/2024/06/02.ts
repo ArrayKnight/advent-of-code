@@ -63,8 +63,10 @@ export default (grid: Grid) => {
 				if (!block) {
 					steps[PositionUtils.toString(p)] = true;
 
-					if (!steps[PositionUtils.toString(next)]) {
-						blocks.set(PositionUtils.toString(next), {
+					const step = PositionUtils.toString(next);
+
+					if (!steps[step]) {
+						blocks.set(step, {
 							block: next,
 							position: p,
 							direction: d,
