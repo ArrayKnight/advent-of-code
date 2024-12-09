@@ -4,13 +4,8 @@ type File = {
 	index: number;
 };
 
-type Space = {
-	size: number;
-	index: number;
-};
-
 export default (dense: number[]) => {
-	const expanded: (File | Space)[] = [];
+	const expanded: (File | null)[] = [];
 	const files: File[] = [];
 	const spaces = new Map<number, number[]>();
 
@@ -28,21 +23,17 @@ export default (dense: number[]) => {
 
 	for (const [index, value] of dense.entries()) {
 		let file: File | null = null;
-		let space: Space | null = null;
 
 		if (index % 2 === 0) {
 			file = { id: index / 2, size: value, index: expanded.length };
 
 			files.push(file);
 		} else if (value) {
-			space = { size: value, index: expanded.length };
-
 			allocate(value, expanded.length);
 		}
 
 		for (let i = 0; i < value; i++) {
-			// biome-ignore lint/style/noNonNullAssertion: <explanation>
-			expanded.push(file ?? space!);
+			expanded.push(file);
 		}
 	}
 
@@ -63,8 +54,6 @@ export default (dense: number[]) => {
 			}
 		}
 
-		const delta = size - file.size;
-
 		if (index > file.index) {
 			continue;
 		}
@@ -74,11 +63,13 @@ export default (dense: number[]) => {
 		for (let j = 0; j < size; j++) {
 			if (j < file.size) {
 				expanded[index + j] = expanded[file.index + j];
-				expanded[file.index + j] = { size: 0, index: file.index };
+				expanded[file.index + j] = null;
 			} else {
-				expanded[index + j] = { size: delta, index: index + file.size };
+				expanded[index + j] = null;
 			}
 		}
+
+		const delta = size - file.size;
 
 		if (delta) {
 			allocate(delta, index + file.size, true);
@@ -86,7 +77,7 @@ export default (dense: number[]) => {
 	}
 
 	return expanded.reduce(
-		(acc, value, index) => acc + ("id" in value ? value.id * index : 0),
+		(acc, value, index) => acc + (value ? value.id * index : 0),
 		0,
 	);
 };
