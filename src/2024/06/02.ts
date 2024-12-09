@@ -93,8 +93,6 @@ export default (grid: Grid) => {
 
 	walk();
 
-	blocks.delete(PositionUtils.toString(position));
-
 	let positions = 0;
 
 	for (const [, block] of blocks) {
