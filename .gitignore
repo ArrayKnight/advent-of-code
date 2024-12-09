@@ -1,0 +1,12 @@
+# Operating system
+.DS_Store
+
+# pnpm
+node_modules
+
+# Vitest
+.vitest
+coverage
+
+# TypeScript cache
+*.tsbuildinfo
