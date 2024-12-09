@@ -71,21 +71,17 @@ export default (dense: number[]) => {
 
 		indices.shift();
 
-		for (let j = 0; j < file.size; j++) {
-			expanded[index + j] = expanded[file.index + j];
-			expanded[file.index + j] = { size: 0, index: file.index };
+		for (let j = 0; j < size; j++) {
+			if (j < file.size) {
+				expanded[index + j] = expanded[file.index + j];
+				expanded[file.index + j] = { size: 0, index: file.index };
+			} else {
+				expanded[index + j] = { size, index: index + file.size };
+			}
 		}
 
 		if (delta) {
-			let j = index + size;
-			let s = delta;
-
-			while (!("id" in expanded[j])) {
-				j++;
-				s++;
-			}
-
-			allocate(s, index + file.size, true);
+			allocate(delta, index + file.size, true);
 		}
 	}
 
