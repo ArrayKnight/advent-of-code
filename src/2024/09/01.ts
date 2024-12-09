@@ -1,7 +1,6 @@
 type File = {
 	id: number;
 	size: number;
-	part: number;
 };
 
 export default (dense: number[]) => {
@@ -9,9 +8,7 @@ export default (dense: number[]) => {
 
 	for (const [index, value] of dense.entries()) {
 		for (let i = 0; i < value; i++) {
-			expanded.push(
-				index % 2 === 0 ? { id: index / 2, size: value, part: i } : null,
-			);
+			expanded.push(index % 2 === 0 ? { id: index / 2, size: value } : null);
 		}
 	}
 
