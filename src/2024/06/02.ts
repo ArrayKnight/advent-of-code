@@ -3,6 +3,25 @@ import { GridUtils, PositionUtils } from "../../utils";
 
 type Direction = "^" | ">" | "v" | "<";
 
+type Block = {
+	block: Position;
+	position: Position;
+	direction: Direction;
+};
+
+const turns: Record<Direction, Direction> = {
+	"^": ">",
+	">": "v",
+	v: "<",
+	"<": "^",
+};
+const ahead: Record<Direction, (pos: Position) => Position> = {
+	"^": (pos: Position) => PositionUtils.sub(pos, [1, 0]),
+	">": (pos: Position) => PositionUtils.add(pos, [0, 1]),
+	v: (pos: Position) => PositionUtils.add(pos, [1, 0]),
+	"<": (pos: Position) => PositionUtils.sub(pos, [0, 1]),
+};
+
 export default (grid: Grid) => {
 	const size = GridUtils.size(grid);
 	const [height, width] = size;
@@ -17,19 +36,7 @@ export default (grid: Grid) => {
 		}
 	}
 
-	const turns: Record<Direction, Direction> = {
-		"^": ">",
-		">": "v",
-		v: "<",
-		"<": "^",
-	};
-	const ahead: Record<Direction, (pos: Position) => Position> = {
-		"^": (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-		">": (pos: Position) => PositionUtils.add(pos, [0, 1]),
-		v: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-		"<": (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-	};
-	const blocks = new Map<string, Position>();
+	const blocks = new Map<string, Block>();
 
 	function placeBlock(pos: Position) {
 		const g = GridUtils.clone(grid);
@@ -39,24 +46,32 @@ export default (grid: Grid) => {
 		return g;
 	}
 
-	function walk(block?: Position) {
-		const g = block ? placeBlock(block) : grid;
-		let p: Position = [...position];
-		let d: Direction = "^";
+	function walk(block?: Block) {
+		const g = block ? placeBlock(block.block) : grid;
+		let p: Position = [...(block?.position ?? position)];
+		let d: Direction = block?.direction ?? "^";
 
 		const steps: Record<string, boolean> = {
 			[PositionUtils.toString(p, d)]: true,
 		};
+		const visited: Record<string, boolean> = {};
 
 		while (PositionUtils.inBounds(p, size)) {
 			const next = ahead[d](p);
-			const [y, x] = next;
 
-			if (g[y]?.[x] === "#") {
+			if (GridUtils.get(g, next) === "#") {
 				d = turns[d];
 			} else {
+				if (!block && !visited[PositionUtils.toString(next)]) {
+					blocks.set(PositionUtils.toString(next), {
+						block: next,
+						position: p,
+						direction: d,
+					});
+				}
+
 				if (!block) {
-					blocks.set(PositionUtils.toString(next), next);
+					visited[PositionUtils.toString(p)] = true;
 				}
 
 				p = next;
