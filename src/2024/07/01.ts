@@ -1,6 +1,6 @@
 import type { Grid } from "../../types";
 
-function canProduce(total: number, values: number[]): boolean {
+function canProduce(total: number, values: number[]) {
 	let totals = [values[0]];
 
 	for (let i = 1; i < values.length; i++) {
