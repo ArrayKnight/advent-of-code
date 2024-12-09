@@ -50,11 +50,9 @@ export default (grid: Grid) => {
 		const g = block ? placeBlock(block.block) : grid;
 		let p: Position = [...(block?.position ?? position)];
 		let d: Direction = block?.direction ?? "^";
-
 		const steps: Record<string, boolean> = {
-			[PositionUtils.toString(p, d)]: true,
+			[PositionUtils.toString(p, block ? d : undefined)]: true,
 		};
-		const visited: Record<string, boolean> = {};
 
 		while (PositionUtils.inBounds(p, size)) {
 			const next = ahead[d](p);
@@ -63,9 +61,9 @@ export default (grid: Grid) => {
 				d = turns[d];
 			} else {
 				if (!block) {
-					visited[PositionUtils.toString(p)] = true;
+					steps[PositionUtils.toString(p)] = true;
 
-					if (!visited[PositionUtils.toString(next)]) {
+					if (!steps[PositionUtils.toString(next)]) {
 						blocks.set(PositionUtils.toString(next), {
 							block: next,
 							position: p,
