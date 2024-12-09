@@ -7,12 +7,12 @@ type File = {
 export default (dense: number[]) => {
 	const expanded: (File | null)[] = [];
 	const files: File[] = [];
-	const spaces = new Map<number, number[]>();
+	const spaces: Record<number, number[]> = {};
 
 	function allocate(size: number, index: number, sort = false) {
-		const space = spaces.get(size) ?? [];
+		const space = spaces[size] ?? [];
 
-		spaces.set(size, space);
+		spaces[size] = space;
 
 		space.push(index);
 
@@ -45,7 +45,7 @@ export default (dense: number[]) => {
 		let index = Number.POSITIVE_INFINITY;
 
 		for (let j = file.size; j < 10; j++) {
-			const idc = spaces.get(j) ?? [];
+			const idc = spaces[j] ?? [];
 
 			if (idc[0] < index) {
 				indices = idc;
