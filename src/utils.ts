@@ -18,16 +18,18 @@ export const GridUtils = {
 			.map((line, y) =>
 				line.split(separator).map((value, x) => callback(value, [y, x])),
 			),
-	set: <T = string>(grid: Grid<T>, [y, x]: Position, value: T) => {
-		const row = grid[y];
+	set: <T = string>(grid: Grid<T>, position: Position, value: T) => {
+		const size = GridUtils.size(grid);
 
-		if (row && x >= 0 && x < row.length) {
-			row[x] = value;
-
-			return true;
+		if (!PositionUtils.inBounds(position, size)) {
+			return false;
 		}
 
-		return false;
+		const [y, x] = position;
+
+		grid[y][x] = value;
+
+		return true;
 	},
 	size: (grid: Grid<unknown>): Position => [grid.length, grid[0].length],
 };
@@ -35,8 +37,11 @@ export const GridUtils = {
 export const PositionUtils = {
 	add: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY + bY, aX + bX],
 	sub: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY - bY, aX - bX],
-	inBounds: ([y, x]: Position, [mY, mX]: Position) =>
-		y >= 0 && y < mY && x >= 0 && x < mX,
+	inBounds: (
+		[y, x]: Position,
+		[MY, MX]: Position,
+		[mY, mX]: Position = [0, 0],
+	) => y >= mY && y < MY && x >= mX && x < MX,
 	toString: ([y, x]: Position, separator = ",") => `${y}${separator}${x}`,
 };
 
