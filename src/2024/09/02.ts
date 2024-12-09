@@ -40,10 +40,6 @@ export default (dense: number[]) => {
 			allocate(value, expanded.length);
 		}
 
-		if (!file && !space) {
-			continue;
-		}
-
 		for (let i = 0; i < value; i++) {
 			// biome-ignore lint/style/noNonNullAssertion: <explanation>
 			expanded.push(file ?? space!);
@@ -52,31 +48,32 @@ export default (dense: number[]) => {
 
 	for (let i = files.length - 1; i >= 0; i--) {
 		const file = files[i];
-		const [size, index] = spaces.entries().reduce(
-			(acc, [size, indices]) => {
-				if (size >= file.size && indices[0] < acc[1]) {
-					return [size, indices[0]];
-				}
 
-				return acc;
-			},
-			[Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY],
-		);
+		let size = Number.POSITIVE_INFINITY;
+		let indices: number[] = [];
+		let index = Number.POSITIVE_INFINITY;
 
-		if (!size) {
-			continue;
+		for (let j = file.size; j < 10; j++) {
+			const idc = spaces.get(j) ?? [];
+
+			if (idc[0] < index) {
+				indices = idc;
+				index = idc[0];
+				size = j;
+			}
 		}
 
 		const delta = size - file.size;
 
-		if (index == null || index > file.index) {
+		if (index > file.index) {
 			continue;
 		}
 
-		spaces.get(size)?.shift();
+		indices.shift();
 
 		for (let j = 0; j < file.size; j++) {
 			expanded[index + j] = expanded[file.index + j];
+			expanded[file.index + j] = { size: 0, index: file.index };
 		}
 
 		if (delta) {
@@ -89,25 +86,6 @@ export default (dense: number[]) => {
 			}
 
 			allocate(s, index + file.size, true);
-		}
-
-		let j = file.index;
-		let s = 0;
-		let e: File | Space;
-
-		while (
-			// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-			(e = expanded[j]) &&
-			(!("id" in e) || e.id === file.id)
-		) {
-			j++;
-			s++;
-		}
-
-		allocate(s, file.index, true);
-
-		for (let k = 0; k < s; k++) {
-			expanded[file.index + k] = { size: s, index: file.index };
 		}
 	}
 
