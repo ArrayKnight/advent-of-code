@@ -62,16 +62,16 @@ export default (grid: Grid) => {
 			if (GridUtils.get(g, next) === "#") {
 				d = turns[d];
 			} else {
-				if (!block && !visited[PositionUtils.toString(next)]) {
-					blocks.set(PositionUtils.toString(next), {
-						block: next,
-						position: p,
-						direction: d,
-					});
-				}
-
 				if (!block) {
 					visited[PositionUtils.toString(p)] = true;
+
+					if (!visited[PositionUtils.toString(next)]) {
+						blocks.set(PositionUtils.toString(next), {
+							block: next,
+							position: p,
+							direction: d,
+						});
+					}
 				}
 
 				p = next;
