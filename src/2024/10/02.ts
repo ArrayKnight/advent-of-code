@@ -46,11 +46,5 @@ export default (grid: Grid<number>) => {
 		);
 	}
 
-	let score = 0;
-
-	for (const trailhead of trailheads) {
-		score += walk(trailhead);
-	}
-
-	return score;
+	return trailheads.reduce((acc, trailhead) => acc + walk(trailhead), 0);
 };

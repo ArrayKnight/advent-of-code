@@ -27,8 +27,8 @@ export default (grid: Grid<number>) => {
 		const value = GridUtils.get(grid, latest);
 
 		if (value === 9) {
-			paths.add(
-				`${PositionUtils.toString(start)}${PositionUtils.toString(latest)}`,
+			return paths.add(
+				`${PositionUtils.toString(start)}:${PositionUtils.toString(latest)}`,
 			);
 		}
 
