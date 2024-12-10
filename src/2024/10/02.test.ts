@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { GridUtils, TimeUtils } from "../../utils";
 import func from "./02";
 
-const options = { separator: "", callback: Number };
+const options = { callback: Number };
 
 const example = GridUtils.parse(
 	`89010123
