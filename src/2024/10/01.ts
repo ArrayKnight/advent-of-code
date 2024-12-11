@@ -23,9 +23,7 @@ export default (grid: Grid<number>) => {
 
 	const paths = new Set<string>();
 
-	function walk(start: Position, latest: Position) {
-		const value = GridUtils.get(grid, latest);
-
+	function walk(start: Position, latest: Position, value: number) {
 		if (value === 9) {
 			return paths.add(
 				`${PositionUtils.toString(start)}:${PositionUtils.toString(latest)}`,
@@ -43,24 +41,24 @@ export default (grid: Grid<number>) => {
 		const wV = GridUtils.get(grid, wP);
 
 		if (nV === next) {
-			walk(start, nP);
+			walk(start, nP, nV);
 		}
 
 		if (eV === next) {
-			walk(start, eP);
+			walk(start, eP, eV);
 		}
 
 		if (sV === next) {
-			walk(start, sP);
+			walk(start, sP, sV);
 		}
 
 		if (wV === next) {
-			walk(start, wP);
+			walk(start, wP, wV);
 		}
 	}
 
 	for (const trailhead of trailheads) {
-		walk(trailhead, trailhead);
+		walk(trailhead, trailhead, 0);
 	}
 
 	return paths.size;

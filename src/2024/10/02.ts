@@ -21,9 +21,7 @@ export default (grid: Grid<number>) => {
 		}
 	}
 
-	function walk(step: Position): number {
-		const value = GridUtils.get(grid, step);
-
+	function walk(step: Position, value: number): number {
 		if (value === 9) {
 			return 1;
 		}
@@ -39,12 +37,12 @@ export default (grid: Grid<number>) => {
 		const wV = GridUtils.get(grid, wP);
 
 		return (
-			(nV === next ? walk(nP) : 0) +
-			(eV === next ? walk(eP) : 0) +
-			(sV === next ? walk(sP) : 0) +
-			(wV === next ? walk(wP) : 0)
+			(nV === next ? walk(nP, nV) : 0) +
+			(eV === next ? walk(eP, eV) : 0) +
+			(sV === next ? walk(sP, sV) : 0) +
+			(wV === next ? walk(wP, wV) : 0)
 		);
 	}
 
-	return trailheads.reduce((acc, trailhead) => acc + walk(trailhead), 0);
+	return trailheads.reduce((acc, trailhead) => acc + walk(trailhead, 0), 0);
 };
