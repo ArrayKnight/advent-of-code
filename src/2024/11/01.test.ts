@@ -9,11 +9,11 @@ function process(input: string) {
 const example = process("125 17");
 
 it("should pass example", () => {
-	expect(TimeUtils.log(() => func(example))).toBe(55312);
+	expect(TimeUtils.log(() => func(example, 25))).toBe(55312);
 });
 
 const challenge = process("5 127 680267 39260 0 26 3553 5851995");
 
 it("should pass challenge", () => {
-	expect(TimeUtils.log(() => func(challenge))).toBe(216042);
+	expect(TimeUtils.log(() => func(challenge, 25))).toBe(216042);
 });
