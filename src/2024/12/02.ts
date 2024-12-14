@@ -108,7 +108,6 @@ export default (grid: Grid) => {
 			}, 0);
 
 		return {
-			positions,
 			area: positions.size,
 			sides,
 		};
@@ -122,7 +121,7 @@ export default (grid: Grid) => {
 			const char = GridUtils.get(grid, position);
 
 			if (char === char.toUpperCase()) {
-				const { positions, area, sides } = collect(position, char);
+				const { area, sides } = collect(position, char);
 
 				cost += area * sides;
 			}

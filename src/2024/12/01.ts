@@ -70,7 +70,7 @@ export default (grid: Grid) => {
 			perimeter += edges;
 		}
 
-		return { positions, area: positions.size, perimeter };
+		return { area: positions.size, perimeter };
 	}
 
 	let cost = 0;
@@ -81,7 +81,7 @@ export default (grid: Grid) => {
 			const char = GridUtils.get(grid, position);
 
 			if (char === char.toUpperCase()) {
-				const { positions, area, perimeter } = collect(position, char);
+				const { area, perimeter } = collect(position, char);
 
 				cost += area * perimeter;
 			}
