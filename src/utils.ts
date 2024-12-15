@@ -33,6 +33,9 @@ export const GridUtils = {
 			}
 		}
 	},
+	log: (grid: Grid<unknown>) => {
+		console.log(grid.map((row) => row.join("")).join("\n"));
+	},
 	parse: <T = string>(
 		input: string,
 		{
@@ -48,9 +51,6 @@ export const GridUtils = {
 			.map((line, y) =>
 				line.split(separator).map((value, x) => callback(value, [y, x])),
 			),
-	print: (grid: Grid<unknown>) => {
-		console.log(grid.map((row) => row.join("")).join("\n"));
-	},
 	reduce: <A, T = string>(
 		grid: Grid<T>,
 		callback: (acc: A, value: T, position: Position, grid: Grid<T>) => A,

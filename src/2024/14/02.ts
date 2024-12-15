@@ -36,7 +36,7 @@ export default (robots: Robot[], size: Position, display?: boolean) => {
 				GridUtils.set(scene, position, "X");
 			}
 
-			GridUtils.print(scene);
+			GridUtils.log(scene);
 		}
 
 		return found;
