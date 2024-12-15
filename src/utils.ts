@@ -36,12 +36,13 @@ export const GridUtils = {
 
 export const PositionUtils = {
 	add: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY + bY, aX + bX],
-	sub: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY - bY, aX - bX],
+	equals: ([aY, aX]: Position, [bY, bX]: Position) => aY === bY && aX === bX,
 	inBounds: (
 		[y, x]: Position,
 		[MY, MX]: Position,
 		[mY, mX]: Position = [0, 0],
 	) => y >= mY && y < MY && x >= mX && x < MX,
+	sub: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY - bY, aX - bX],
 	toString: ([y, x]: Position, separator = ",") => `${y}${separator}${x}`,
 };
 
