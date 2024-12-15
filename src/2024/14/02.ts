@@ -49,15 +49,15 @@ export default (robots: Robot[], size: Position, display?: boolean) => {
 			let [y, x] = PositionUtils.add(robot.position, robot.velocity);
 
 			if (y < 0) {
-				y = height + y;
+				y += height;
 			} else if (y >= height) {
-				y = y - height;
+				y -= height;
 			}
 
 			if (x < 0) {
-				x = width + x;
+				x += width;
 			} else if (x >= width) {
-				x = x - width;
+				x -= width;
 			}
 
 			robot.position = [y, x];
