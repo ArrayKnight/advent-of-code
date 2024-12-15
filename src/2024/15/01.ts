@@ -20,7 +20,7 @@ export default ({ grid, instructions }: Input) => {
 
 	if (!position) return;
 
-	inst: for (const instruction of instructions) {
+	i: for (const instruction of instructions) {
 		const next = ahead[instruction as Direction](position);
 		const char = GridUtils.get(grid, next);
 
@@ -36,42 +36,41 @@ export default ({ grid, instructions }: Input) => {
 		}
 
 		let sibling: Position;
-		const moving = new Map<string, Position>([
+		const evaluating = new Map<string, Position>([
 			[PositionUtils.toString(next), next],
 		]);
+		const moving = new Map<string, [Position, Position, string]>();
 
 		if (char === "[" || char === "]") {
 			sibling = ahead[char === "[" ? ">" : "<"](next);
 
-			moving.set(PositionUtils.toString(sibling), sibling);
+			evaluating.set(PositionUtils.toString(sibling), sibling);
 		}
 
-		for (const [, p] of moving) {
+		for (const [, p] of evaluating) {
 			const n = ahead[instruction as Direction](p);
 			const c = GridUtils.get(grid, n);
 
 			if (c === "#") {
-				continue inst;
+				continue i;
 			}
 
+			moving.set(PositionUtils.toString(p), [p, n, GridUtils.get(grid, p)]);
+
 			if (c !== ".") {
-				moving.set(PositionUtils.toString(n), n);
+				evaluating.set(PositionUtils.toString(n), n);
 			}
 
 			if (c === "[" || c === "]") {
 				sibling = ahead[c === "[" ? ">" : "<"](n);
 
-				moving.set(PositionUtils.toString(sibling), sibling);
+				evaluating.set(PositionUtils.toString(sibling), sibling);
 			}
 		}
 
-		const m = moving.values().toArray();
+		const m = moving.values().toArray().reverse();
 
-		for (let i = m.length - 1; i >= 0; i--) {
-			const p = m[i];
-			const n = ahead[instruction as Direction](p);
-			const c = GridUtils.get(grid, p);
-
+		for (const [p, n, c] of m) {
 			GridUtils.set(grid, n, c);
 			GridUtils.set(grid, p, ".");
 		}
@@ -81,13 +80,10 @@ export default ({ grid, instructions }: Input) => {
 		position = next;
 	}
 
-	let gps = 0;
-
-	GridUtils.forEach(grid, (value, [y, x]) => {
-		if (value === "O" || value === "[") {
-			gps += 100 * y + x;
-		}
-	});
-
-	return gps;
+	return GridUtils.reduce(
+		grid,
+		(acc, value, [y, x]) =>
+			acc + (value === "O" || value === "[" ? 100 * y + x : 0),
+		0,
+	);
 };
