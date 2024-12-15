@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { GridUtils, TimeUtils } from "../../utils";
-import func from "./02";
+import func from "./01";
 
 function process(input: string) {
 	const [grid, instructions] = input.split("\n\n");
