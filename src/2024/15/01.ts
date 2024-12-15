@@ -16,17 +16,9 @@ const ahead: Record<Direction, (pos: Position) => Position> = {
 };
 
 export default ({ grid, instructions }: Input) => {
-	const size = GridUtils.size(grid);
-	const [height, width] = size;
-	let position: Position = [0, 0];
+	let position = GridUtils.find(grid, "@");
 
-	for (let i = 0; i < height; i++) {
-		for (let j = 0; j < width; j++) {
-			if (GridUtils.get(grid, [i, j]) === "@") {
-				position = [i, j];
-			}
-		}
-	}
+	if (!position) return;
 
 	inst: for (const instruction of instructions) {
 		const next = ahead[instruction as Direction](position);
@@ -91,15 +83,11 @@ export default ({ grid, instructions }: Input) => {
 
 	let gps = 0;
 
-	for (let i = 0; i < height; i++) {
-		for (let j = 0; j < width; j++) {
-			const char = GridUtils.get(grid, [i, j]);
-
-			if (char === "O" || char === "[") {
-				gps += 100 * i + j;
-			}
+	GridUtils.forEach(grid, (value, [y, x]) => {
+		if (value === "O" || value === "[") {
+			gps += 100 * y + x;
 		}
-	}
+	});
 
 	return gps;
 };

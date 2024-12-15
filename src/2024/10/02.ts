@@ -9,17 +9,17 @@ const ahead: Record<string, (pos: Position) => Position> = {
 };
 
 export default (grid: Grid<number>) => {
-	const size = GridUtils.size(grid);
-	const [height, width] = size;
-	const trailheads: Position[] = [];
-
-	for (let i = 0; i < height; i++) {
-		for (let j = 0; j < width; j++) {
-			if (!GridUtils.get(grid, [i, j])) {
-				trailheads.push([i, j]);
+	const trailheads = GridUtils.reduce<Position[], number>(
+		grid,
+		(acc, value, position) => {
+			if (!value) {
+				acc.push(position);
 			}
-		}
-	}
+
+			return acc;
+		},
+		[],
+	);
 
 	function walk(step: Position, value: number): number {
 		if (value === 9) {

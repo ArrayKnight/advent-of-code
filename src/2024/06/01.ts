@@ -19,17 +19,10 @@ const ahead: Record<Direction, (pos: Position) => Position> = {
 export default (grid: Grid) => {
 	const size = GridUtils.size(grid);
 	const [height, width] = size;
-
-	let position: Position = [0, 0];
 	let direction: Direction = "^";
+	let position = GridUtils.find(grid, direction);
 
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			if (GridUtils.get(grid, [y, x]) === direction) {
-				position = [y, x];
-			}
-		}
-	}
+	if (!position) return;
 
 	const positions = new Set<string>();
 

@@ -36,7 +36,7 @@ export default (robots: Robot[], size: Position, display?: boolean) => {
 				GridUtils.set(scene, position, "X");
 			}
 
-			console.log(scene.map((line) => line.join("")).join("\n"));
+			GridUtils.print(scene);
 		}
 
 		return found;

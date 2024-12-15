@@ -9,9 +9,6 @@ const ahead: Record<string, (pos: Position) => Position> = {
 };
 
 export default (grid: Grid) => {
-	const size = GridUtils.size(grid);
-	const [height, width] = size;
-
 	function collect(position: Position, char: string) {
 		const positions = new Map<string, Position>();
 		const queue = new Map<string, Position>([
@@ -115,18 +112,13 @@ export default (grid: Grid) => {
 
 	let cost = 0;
 
-	for (let i = 0; i < height; i++) {
-		for (let j = 0; j < width; j++) {
-			const position: Position = [i, j];
-			const char = GridUtils.get(grid, position);
+	GridUtils.forEach(grid, (value, position) => {
+		if (value === value.toUpperCase()) {
+			const { area, sides } = collect(position, value);
 
-			if (char === char.toUpperCase()) {
-				const { area, sides } = collect(position, char);
-
-				cost += area * sides;
-			}
+			cost += area * sides;
 		}
-	}
+	});
 
 	return cost;
 };

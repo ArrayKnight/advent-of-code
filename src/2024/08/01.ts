@@ -5,18 +5,18 @@ type Group = Position[];
 
 export default (grid: Grid) => {
 	const size = GridUtils.size(grid);
-
-	const frequencies = grid.reduce<Record<string, Group>>((acc, row, y) => {
-		for (const [x, char] of row.entries()) {
-			if (char !== ".") {
-				acc[char] ??= [];
-				acc[char].push([y, x]);
+	const frequencies = GridUtils.reduce<Record<string, Group>>(
+		grid,
+		(acc, value, position) => {
+			if (value !== ".") {
+				acc[value] ??= [];
+				acc[value].push(position);
 			}
-		}
 
-		return acc;
-	}, {});
-
+			return acc;
+		},
+		{},
+	);
 	const groups = Object.values(frequencies);
 	const positions: Record<string, boolean> = {};
 

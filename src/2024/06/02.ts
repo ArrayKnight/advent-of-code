@@ -24,19 +24,10 @@ const ahead: Record<Direction, (pos: Position) => Position> = {
 
 export default (grid: Grid) => {
 	const size = GridUtils.size(grid);
-	const [height, width] = size;
-
-	let position: Position = [0, 0];
-
-	for (let y = 0; y < height; y++) {
-		for (let x = 0; x < width; x++) {
-			if (GridUtils.get(grid, [y, x]) === "^") {
-				position = [y, x];
-			}
-		}
-	}
-
+	const position = GridUtils.find(grid, "^");
 	const blocks = new Map<string, Block>();
+
+	if (!position) return;
 
 	function placeBlock(pos: Position) {
 		const g = GridUtils.clone(grid);
@@ -46,9 +37,9 @@ export default (grid: Grid) => {
 		return g;
 	}
 
-	function walk(block?: Block) {
+	function walk(start: Position, block?: Block) {
 		const g = block ? placeBlock(block.block) : grid;
-		let p: Position = [...(block?.position ?? position)];
+		let p: Position = [...(block?.position ?? start)];
 		let d: Direction = block?.direction ?? "^";
 		const steps: Record<string, boolean> = {
 			[PositionUtils.toString(p, block ? d : undefined)]: true,
@@ -91,12 +82,12 @@ export default (grid: Grid) => {
 		return false;
 	}
 
-	walk();
+	walk(position);
 
 	let positions = 0;
 
 	for (const [, block] of blocks) {
-		if (walk(block)) {
+		if (walk(position, block)) {
 			positions++;
 		}
 	}
