@@ -11,31 +11,21 @@ export default (robots: Robot[], size: Position, iterations: number) => {
 
 	for (let i = 0; i < iterations; i++) {
 		for (const robot of robots) {
-			let next = PositionUtils.add(robot.position, robot.velocity);
+			let [y, x] = PositionUtils.add(robot.position, robot.velocity);
 
-			if (!PositionUtils.inBounds(next, size)) {
-				let [y, x] = next;
-
-				if (y < 0) {
-					y = height + y;
-				}
-
-				if (y >= height) {
-					y = y - height;
-				}
-
-				if (x < 0) {
-					x = width + x;
-				}
-
-				if (x >= width) {
-					x = x - width;
-				}
-
-				next = [y, x];
+			if (y < 0) {
+				y = height + y;
+			} else if (y >= height) {
+				y = y - height;
 			}
 
-			robot.position = next;
+			if (x < 0) {
+				x = width + x;
+			} else if (x >= width) {
+				x = x - width;
+			}
+
+			robot.position = [y, x];
 		}
 	}
 
