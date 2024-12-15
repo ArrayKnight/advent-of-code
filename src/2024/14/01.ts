@@ -1,5 +1,4 @@
 import type { Position } from "../../types";
-import { PositionUtils } from "../../utils";
 
 type Robot = {
 	position: Position;
@@ -9,24 +8,22 @@ type Robot = {
 export default (robots: Robot[], size: Position, iterations: number) => {
 	const [height, width] = size;
 
-	for (let i = 0; i < iterations; i++) {
-		for (const robot of robots) {
-			let [y, x] = PositionUtils.add(robot.position, robot.velocity);
+	for (const robot of robots) {
+		const [dY, dX] = robot.velocity;
+		let [y, x] = robot.position;
 
-			if (y < 0) {
-				y += height;
-			} else if (y >= height) {
-				y -= height;
-			}
+		y = (dY * iterations + y) % height;
+		x = (dX * iterations + x) % width;
 
-			if (x < 0) {
-				x += width;
-			} else if (x >= width) {
-				x -= width;
-			}
-
-			robot.position = [y, x];
+		if (y < 0) {
+			y += height;
 		}
+
+		if (x < 0) {
+			x += width;
+		}
+
+		robot.position = [y, x];
 	}
 
 	const middle = {
