@@ -3,6 +3,36 @@ import type { Grid, Position } from "./types";
 export const GridUtils = {
 	clone: <T = string>(grid: Grid<T>): Grid<T> => grid.map((row) => [...row]),
 	get: <T = string>(grid: Grid<T>, [y, x]: Position) => grid[y]?.[x],
+	find: (grid: Grid<unknown>, value: unknown): Position | null => {
+		let position: Position | null = null;
+
+		GridUtils.forEach(grid, (val, pos) => {
+			if (val === value) {
+				position = pos;
+
+				return true;
+			}
+		});
+
+		return position;
+	},
+	forEach: <T = string>(
+		grid: Grid<T>,
+		// biome-ignore lint/suspicious/noConfusingVoidType: <explanation>
+		callback: (value: T, position: Position, grid: Grid<T>) => void | boolean,
+	) => {
+		const [height, width] = GridUtils.size(grid);
+
+		for (let y = 0; y < height; y++) {
+			for (let x = 0; x < width; x++) {
+				const position: Position = [y, x];
+
+				if (callback(GridUtils.get(grid, position), position, grid)) {
+					return;
+				}
+			}
+		}
+	},
 	parse: <T = string>(
 		input: string,
 		{
@@ -18,6 +48,22 @@ export const GridUtils = {
 			.map((line, y) =>
 				line.split(separator).map((value, x) => callback(value, [y, x])),
 			),
+	print: (grid: Grid<unknown>) => {
+		console.log(grid.map((row) => row.join("")).join("\n"));
+	},
+	reduce: <A, T = string>(
+		grid: Grid<T>,
+		callback: (acc: A, value: T, position: Position, grid: Grid<T>) => A,
+		acc: A,
+	) => {
+		let a: A = acc;
+
+		GridUtils.forEach(grid, (value, position) => {
+			a = callback(a, value, position, grid);
+		});
+
+		return a;
+	},
 	set: <T = string>(grid: Grid<T>, position: Position, value: T) => {
 		const size = GridUtils.size(grid);
 
