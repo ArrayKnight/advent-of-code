@@ -2,11 +2,14 @@ import type { Grid, Position } from "../../types";
 import { GridUtils, PositionUtils } from "../../utils";
 
 type Direction = "N" | "E" | "S" | "W";
+
 type Step = {
 	position: Position;
 	direction: Direction;
 };
+
 type Cost = Record<Direction, Record<Direction, number | null> | null>;
+
 type Marker = { step: Step; score: number };
 
 const CW: Record<Direction, Direction> = {
@@ -26,12 +29,6 @@ const SCORE = {
 	move: 1,
 	rotate: 1000,
 };
-const ahead: Record<string, (pos: Position) => Position> = {
-	N: (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-	E: (pos: Position) => PositionUtils.add(pos, [0, 1]),
-	S: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-	W: (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-};
 
 export default (grid: Grid) => {
 	const start = GridUtils.find(grid, "S");
@@ -47,13 +44,13 @@ export default (grid: Grid) => {
 				GridUtils.set(acc, position, null);
 			}
 
-			const nP = ahead.N(position);
+			const nP = PositionUtils.ahead.N(position);
 			const nV = GridUtils.get(grid, nP);
-			const eP = ahead.E(position);
+			const eP = PositionUtils.ahead.E(position);
 			const eV = GridUtils.get(grid, eP);
-			const sP = ahead.S(position);
+			const sP = PositionUtils.ahead.S(position);
 			const sV = GridUtils.get(grid, sP);
-			const wP = ahead.W(position);
+			const wP = PositionUtils.ahead.W(position);
 			const wV = GridUtils.get(grid, wP);
 
 			GridUtils.set(acc, position, {
@@ -130,7 +127,7 @@ export default (grid: Grid) => {
 		const options = [
 			{
 				step: {
-					position: ahead[direction](position),
+					position: PositionUtils.ahead[direction](position),
 					direction: direction,
 				},
 				score: score + (cost?.[direction]?.[direction] ?? MAX),

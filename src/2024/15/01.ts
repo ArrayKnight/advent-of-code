@@ -8,20 +8,13 @@ type Input = {
 
 type Direction = "^" | ">" | "v" | "<";
 
-const ahead: Record<Direction, (pos: Position) => Position> = {
-	"^": (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-	">": (pos: Position) => PositionUtils.add(pos, [0, 1]),
-	v: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-	"<": (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-};
-
 export default ({ grid, instructions }: Input) => {
 	let position = GridUtils.find(grid, "@");
 
 	if (!position) return;
 
 	i: for (const instruction of instructions) {
-		const next = ahead[instruction as Direction](position);
+		const next = PositionUtils.ahead[instruction as Direction](position);
 		const char = GridUtils.get(grid, next);
 
 		if (char === "#") {
@@ -43,13 +36,13 @@ export default ({ grid, instructions }: Input) => {
 		const moving = new Map<string, [Position, Position, string]>();
 
 		if (char === "[" || char === "]") {
-			const sibling = ahead[char === "[" ? ">" : "<"](next);
+			const sibling = PositionUtils.ahead[char === "[" ? ">" : "<"](next);
 
 			evaluating.set(PositionUtils.toString(sibling), sibling);
 		}
 
 		for (const [, p] of evaluating) {
-			const n = ahead[instruction as Direction](p);
+			const n = PositionUtils.ahead[instruction as Direction](p);
 			const c = GridUtils.get(grid, n);
 
 			if (c === "#") {
@@ -63,7 +56,7 @@ export default ({ grid, instructions }: Input) => {
 			}
 
 			if (c === "[" || c === "]") {
-				const sibling = ahead[c === "[" ? ">" : "<"](n);
+				const sibling = PositionUtils.ahead[c === "[" ? ">" : "<"](n);
 
 				evaluating.set(PositionUtils.toString(sibling), sibling);
 			}

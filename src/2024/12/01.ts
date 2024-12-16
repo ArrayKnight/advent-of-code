@@ -1,13 +1,6 @@
 import type { Grid, Position } from "../../types";
 import { GridUtils, PositionUtils } from "../../utils";
 
-const ahead: Record<string, (pos: Position) => Position> = {
-	N: (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-	E: (pos: Position) => PositionUtils.add(pos, [0, 1]),
-	S: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-	W: (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-};
-
 export default (grid: Grid) => {
 	function collect(position: Position, char: string) {
 		const positions = new Map<string, Position>();
@@ -21,13 +14,13 @@ export default (grid: Grid) => {
 
 			GridUtils.set(grid, p, char.toLowerCase());
 
-			const nP = ahead.N(p);
+			const nP = PositionUtils.ahead.N(p);
 			const nV = GridUtils.get(grid, nP);
-			const eP = ahead.E(p);
+			const eP = PositionUtils.ahead.E(p);
 			const eV = GridUtils.get(grid, eP);
-			const sP = ahead.S(p);
+			const sP = PositionUtils.ahead.S(p);
 			const sV = GridUtils.get(grid, sP);
-			const wP = ahead.W(p);
+			const wP = PositionUtils.ahead.W(p);
 			const wV = GridUtils.get(grid, wP);
 
 			let edges = 4;

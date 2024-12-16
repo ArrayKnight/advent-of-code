@@ -80,16 +80,35 @@ export const GridUtils = {
 	size: (grid: Grid<unknown>): Position => [grid.length, grid[0].length],
 };
 
-export const PositionUtils = {
-	add: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY + bY, aX + bX],
-	equals: ([aY, aX]: Position, [bY, bX]: Position) => aY === bY && aX === bX,
-	inBounds: (
-		[y, x]: Position,
-		[MY, MX]: Position,
-		[mY, mX]: Position = [0, 0],
-	) => y >= mY && y < MY && x >= mX && x < MX,
-	sub: ([aY, aX]: Position, [bY, bX]: Position): Position => [aY - bY, aX - bX],
-	toString: ([y, x]: Position, separator = ",") => `${y}${separator}${x}`,
+type PositionUtilsType = {
+	add: (a: Position, b: Position) => Position;
+	ahead: Record<
+		"N" | "E" | "S" | "W" | "^" | ">" | "v" | "<",
+		(position: Position) => Position
+	>;
+	equals: (a: Position, b: Position) => boolean;
+	inBounds: (position: Position, max: Position, min?: Position) => boolean;
+	sub: (a: Position, b: Position) => Position;
+	toString: (position: Position, separator?: string) => string;
+};
+
+export const PositionUtils: PositionUtilsType = {
+	add: ([aY, aX], [bY, bX]) => [aY + bY, aX + bX],
+	ahead: {
+		N: (position) => PositionUtils.sub(position, [1, 0]),
+		E: (position) => PositionUtils.add(position, [0, 1]),
+		S: (position) => PositionUtils.add(position, [1, 0]),
+		W: (position) => PositionUtils.sub(position, [0, 1]),
+		"^": (position) => PositionUtils.sub(position, [1, 0]),
+		">": (position) => PositionUtils.add(position, [0, 1]),
+		v: (position) => PositionUtils.add(position, [1, 0]),
+		"<": (position) => PositionUtils.sub(position, [0, 1]),
+	},
+	equals: ([aY, aX], [bY, bX]) => aY === bY && aX === bX,
+	inBounds: ([y, x], [MY, MX], [mY, mX] = [0, 0]) =>
+		y >= mY && y < MY && x >= mX && x < MX,
+	sub: ([aY, aX], [bY, bX]) => [aY - bY, aX - bX],
+	toString: ([y, x], separator = ",") => `${y}${separator}${x}`,
 };
 
 export const TimeUtils = {

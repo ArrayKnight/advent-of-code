@@ -9,16 +9,9 @@ const turns: Record<Direction, Direction> = {
 	v: "<",
 	"<": "^",
 };
-const ahead: Record<Direction, (pos: Position) => Position> = {
-	"^": (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-	">": (pos: Position) => PositionUtils.add(pos, [0, 1]),
-	v: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-	"<": (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-};
 
 export default (grid: Grid) => {
 	const size = GridUtils.size(grid);
-	const [height, width] = size;
 	let direction: Direction = "^";
 	let position = GridUtils.find(grid, direction);
 
@@ -26,8 +19,8 @@ export default (grid: Grid) => {
 
 	const positions = new Set<string>();
 
-	while (PositionUtils.inBounds(position, size)) {
-		const next = ahead[direction](position);
+	while (position && PositionUtils.inBounds(position, size)) {
+		const next = PositionUtils.ahead[direction](position);
 
 		if (GridUtils.get(grid, next) === "#") {
 			direction = turns[direction];

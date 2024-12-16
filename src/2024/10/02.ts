@@ -1,13 +1,6 @@
 import type { Grid, Position } from "../../types";
 import { GridUtils, PositionUtils } from "../../utils";
 
-const ahead: Record<string, (pos: Position) => Position> = {
-	N: (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-	E: (pos: Position) => PositionUtils.add(pos, [0, 1]),
-	S: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-	W: (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-};
-
 export default (grid: Grid<number>) => {
 	const trailheads = GridUtils.reduce<Position[], number>(
 		grid,
@@ -27,13 +20,13 @@ export default (grid: Grid<number>) => {
 		}
 
 		const next = value + 1;
-		const nP = ahead.N(step);
+		const nP = PositionUtils.ahead.N(step);
 		const nV = GridUtils.get(grid, nP);
-		const eP = ahead.E(step);
+		const eP = PositionUtils.ahead.E(step);
 		const eV = GridUtils.get(grid, eP);
-		const sP = ahead.S(step);
+		const sP = PositionUtils.ahead.S(step);
 		const sV = GridUtils.get(grid, sP);
-		const wP = ahead.W(step);
+		const wP = PositionUtils.ahead.W(step);
 		const wV = GridUtils.get(grid, wP);
 
 		return (

@@ -15,12 +15,6 @@ const turns: Record<Direction, Direction> = {
 	v: "<",
 	"<": "^",
 };
-const ahead: Record<Direction, (pos: Position) => Position> = {
-	"^": (pos: Position) => PositionUtils.sub(pos, [1, 0]),
-	">": (pos: Position) => PositionUtils.add(pos, [0, 1]),
-	v: (pos: Position) => PositionUtils.add(pos, [1, 0]),
-	"<": (pos: Position) => PositionUtils.sub(pos, [0, 1]),
-};
 
 export default (grid: Grid) => {
 	const size = GridUtils.size(grid);
@@ -46,7 +40,7 @@ export default (grid: Grid) => {
 		};
 
 		while (PositionUtils.inBounds(p, size)) {
-			const next = ahead[d](p);
+			const next = PositionUtils.ahead[d](p);
 
 			if (GridUtils.get(g, next) === "#") {
 				d = turns[d];
