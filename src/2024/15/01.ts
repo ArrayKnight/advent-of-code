@@ -68,9 +68,11 @@ export default ({ grid, instructions }: Input) => {
 			}
 		}
 
-		const m = moving.values().toArray().reverse();
+		const m = moving.values().toArray();
 
-		for (const [p, n, c] of m) {
+		for (let i = m.length - 1; i >= 0; i--) {
+			const [p, n, c] = m[i];
+
 			GridUtils.set(grid, n, c);
 			GridUtils.set(grid, p, ".");
 		}
