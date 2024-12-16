@@ -1,19 +1,22 @@
 import type { Grid, Position } from "../../types";
 import { GridUtils, PositionUtils } from "../../utils";
 
+type Direction = "N" | "E" | "S" | "W";
 type Step = {
 	position: Position;
-	direction: string;
+	direction: Direction;
 };
-type Cost = Record<string, Record<string, number | null> | null>;
+type Cost = Record<Direction, Record<Direction, number | null> | null>;
+type Marker = { step: Step; score: number };
+type Path = { steps: Step[]; score: number };
 
-const cw: Record<string, string> = {
+const CW: Record<Direction, Direction> = {
 	N: "E",
 	E: "S",
 	S: "W",
 	W: "N",
 };
-const ccw: Record<string, string> = {
+const CCW: Record<Direction, Direction> = {
 	N: "W",
 	W: "S",
 	S: "E",
@@ -24,7 +27,7 @@ const SCORE = {
 	move: 1,
 	rotate: 1000,
 };
-const ahead: Record<string, (pos: Position) => Position> = {
+const ahead: Record<Direction, (pos: Position) => Position> = {
 	N: (pos: Position) => PositionUtils.sub(pos, [1, 0]),
 	E: (pos: Position) => PositionUtils.add(pos, [0, 1]),
 	S: (pos: Position) => PositionUtils.add(pos, [1, 0]),
@@ -98,24 +101,28 @@ export default (grid: Grid) => {
 		Array.from({ length: height }, () => new Array(width)),
 	);
 
-	let least = MAX;
-	const complete: { steps: Step[]; score: number }[] = [];
-	const active: { steps: Step[]; score: number }[] = [
-		{ steps: [{ position: start, direction: "E" }], score: 0 },
-	];
-	const positions = new Map<string, { step: Step; score: number }>([
+	const initial: Step = { position: start, direction: "E" };
+	const active: Path[] = [{ steps: [initial], score: 0 }];
+	const markers = new Map<string, Marker>([
 		[
-			PositionUtils.toString(start, "E"),
-			{ step: { position: start, direction: "E" }, score: 0 },
+			PositionUtils.toString(initial.position, initial.direction),
+			{ step: initial, score: 0 },
 		],
 	]);
+	const complete: Path[] = [];
+	let least = MAX;
 
 	while (active.length) {
-		const { steps, score } = active.shift() as { steps: Step[]; score: number };
+		const path = active.shift();
+
+		if (!path) break;
+
+		const { steps, score } = path;
 		const step = steps[steps.length - 1];
+		const { position, direction } = step;
 
 		if (PositionUtils.equals(step.position, end)) {
-			complete.push({ steps, score });
+			complete.push(path);
 
 			if (score < least) {
 				least = score;
@@ -124,20 +131,36 @@ export default (grid: Grid) => {
 			continue;
 		}
 
-		const options = walk(step, score);
+		const cost = GridUtils.get(costs, position);
+		const options = [
+			{
+				step: {
+					position: ahead[direction](position),
+					direction: direction,
+				},
+				score: score + (cost?.[direction]?.[direction] ?? MAX),
+			},
+			{
+				step: { position: position, direction: CW[direction] },
+				score: score + (cost?.[CW[direction]]?.[direction] ?? MAX),
+			},
+			{
+				step: { position: position, direction: CCW[direction] },
+				score: score + (cost?.[CCW[direction]]?.[direction] ?? MAX),
+			},
+		];
 
 		for (const option of options) {
+			if (option.score === MAX) continue;
+
 			const key = PositionUtils.toString(
 				option.step.position,
 				option.step.direction,
 			);
-			const existing = positions.get(key);
+			const marker = markers.get(key);
 
-			if (
-				option.score !== MAX &&
-				(!existing || option.score <= existing.score)
-			) {
-				positions.set(key, option);
+			if (!marker || option.score <= marker.score) {
+				markers.set(key, option);
 				active.push({
 					steps: [...steps, option.step],
 					score: option.score,
@@ -146,37 +169,13 @@ export default (grid: Grid) => {
 		}
 	}
 
-	function walk(latest: Step, score: number) {
-		const cost = GridUtils.get(costs, latest.position);
-
-		return [
-			{
-				step: {
-					position: ahead[latest.direction](latest.position),
-					direction: latest.direction,
-				},
-				score: score + (cost?.[latest.direction]?.[latest.direction] ?? MAX),
-			},
-			{
-				step: { position: latest.position, direction: cw[latest.direction] },
-				score:
-					score + (cost?.[cw[latest.direction]]?.[latest.direction] ?? MAX),
-			},
-			{
-				step: { position: latest.position, direction: ccw[latest.direction] },
-				score:
-					score + (cost?.[ccw[latest.direction]]?.[latest.direction] ?? MAX),
-			},
-		];
-	}
-
-	return complete
-		.filter(({ score }) => score === least)
-		.reduce((acc, { steps }) => {
+	return complete.reduce((acc, { score, steps }) => {
+		if (score === least) {
 			for (const { position } of steps) {
 				acc.add(PositionUtils.toString(position));
 			}
+		}
 
-			return acc;
-		}, new Set<string>()).size;
+		return acc;
+	}, new Set<string>()).size;
 };
