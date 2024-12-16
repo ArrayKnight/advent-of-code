@@ -44,18 +44,11 @@ export default (grid: Grid) => {
 				GridUtils.set(acc, position, null);
 			}
 
-			const nP = PositionUtils.ahead.N(position);
-			const nV = GridUtils.get(grid, nP);
-			const eP = PositionUtils.ahead.E(position);
-			const eV = GridUtils.get(grid, eP);
-			const sP = PositionUtils.ahead.S(position);
-			const sV = GridUtils.get(grid, sP);
-			const wP = PositionUtils.ahead.W(position);
-			const wV = GridUtils.get(grid, wP);
+			const { N, E, S, W } = GridUtils.adjacent(grid, position);
 
 			GridUtils.set(acc, position, {
 				N:
-					nV === "#"
+					N.value === "#"
 						? null
 						: {
 								N: SCORE.move,
@@ -64,7 +57,7 @@ export default (grid: Grid) => {
 								W: SCORE.rotate,
 							},
 				E:
-					eV === "#"
+					E.value === "#"
 						? null
 						: {
 								N: SCORE.rotate,
@@ -73,7 +66,7 @@ export default (grid: Grid) => {
 								W: null,
 							},
 				S:
-					sV === "#"
+					S.value === "#"
 						? null
 						: {
 								N: null,
@@ -82,7 +75,7 @@ export default (grid: Grid) => {
 								W: SCORE.rotate,
 							},
 				W:
-					wV === "#"
+					W.value === "#"
 						? null
 						: {
 								N: SCORE.rotate,

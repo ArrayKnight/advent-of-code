@@ -20,20 +20,13 @@ export default (grid: Grid<number>) => {
 		}
 
 		const next = value + 1;
-		const nP = PositionUtils.ahead.N(step);
-		const nV = GridUtils.get(grid, nP);
-		const eP = PositionUtils.ahead.E(step);
-		const eV = GridUtils.get(grid, eP);
-		const sP = PositionUtils.ahead.S(step);
-		const sV = GridUtils.get(grid, sP);
-		const wP = PositionUtils.ahead.W(step);
-		const wV = GridUtils.get(grid, wP);
+		const { N, E, S, W } = GridUtils.adjacent(grid, step);
 
 		return (
-			(nV === next ? walk(nP, nV) : 0) +
-			(eV === next ? walk(eP, eV) : 0) +
-			(sV === next ? walk(sP, sV) : 0) +
-			(wV === next ? walk(wP, wV) : 0)
+			(N.value === next ? walk(N.position, N.value) : 0) +
+			(E.value === next ? walk(E.position, E.value) : 0) +
+			(S.value === next ? walk(S.position, S.value) : 0) +
+			(W.value === next ? walk(W.position, W.value) : 0)
 		);
 	}
 

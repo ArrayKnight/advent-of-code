@@ -14,46 +14,39 @@ export default (grid: Grid) => {
 
 			GridUtils.set(grid, p, char.toLowerCase());
 
-			const nP = PositionUtils.ahead.N(p);
-			const nV = GridUtils.get(grid, nP);
-			const eP = PositionUtils.ahead.E(p);
-			const eV = GridUtils.get(grid, eP);
-			const sP = PositionUtils.ahead.S(p);
-			const sV = GridUtils.get(grid, sP);
-			const wP = PositionUtils.ahead.W(p);
-			const wV = GridUtils.get(grid, wP);
+			const { N, E, S, W } = GridUtils.adjacent(grid, p);
 
 			let edges = 4;
 
-			if (nV === char) {
-				queue.set(PositionUtils.toString(nP), nP);
+			if (N.value === char) {
+				queue.set(PositionUtils.toString(N.position), N.position);
 			}
 
-			if (nV === char || nV?.toUpperCase() === char) {
+			if (N.value === char || N.value?.toUpperCase() === char) {
 				edges--;
 			}
 
-			if (eV === char) {
-				queue.set(PositionUtils.toString(eP), eP);
+			if (E.value === char) {
+				queue.set(PositionUtils.toString(E.position), E.position);
 			}
 
-			if (eV === char || eV?.toUpperCase() === char) {
+			if (E.value === char || E.value?.toUpperCase() === char) {
 				edges--;
 			}
 
-			if (sV === char) {
-				queue.set(PositionUtils.toString(sP), sP);
+			if (S.value === char) {
+				queue.set(PositionUtils.toString(S.position), S.position);
 			}
 
-			if (sV === char || sV?.toUpperCase() === char) {
+			if (S.value === char || S.value?.toUpperCase() === char) {
 				edges--;
 			}
 
-			if (wV === char) {
-				queue.set(PositionUtils.toString(wP), wP);
+			if (W.value === char) {
+				queue.set(PositionUtils.toString(W.position), W.position);
 			}
 
-			if (wV === char || wV?.toUpperCase() === char) {
+			if (W.value === char || W.value?.toUpperCase() === char) {
 				edges--;
 			}
 

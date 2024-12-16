@@ -17,47 +17,40 @@ export default (grid: Grid) => {
 
 			GridUtils.set(grid, p, char.toLowerCase());
 
-			const nP = PositionUtils.ahead.N(p);
-			const nV = GridUtils.get(grid, nP);
-			const eP = PositionUtils.ahead.E(p);
-			const eV = GridUtils.get(grid, eP);
-			const sP = PositionUtils.ahead.S(p);
-			const sV = GridUtils.get(grid, sP);
-			const wP = PositionUtils.ahead.W(p);
-			const wV = GridUtils.get(grid, wP);
+			const { N, E, S, W } = GridUtils.adjacent(grid, p);
 
-			if (nV === char) {
-				queue.set(PositionUtils.toString(nP), nP);
+			if (N.value === char) {
+				queue.set(PositionUtils.toString(N.position), N.position);
 			}
 
-			if (nV?.toUpperCase() !== char) {
+			if (N.value?.toUpperCase() !== char) {
 				axis.x[p[0] - 0.5] ??= [];
 				axis.x[p[0] - 0.5].push(p);
 			}
 
-			if (eV === char) {
-				queue.set(PositionUtils.toString(eP), eP);
+			if (E.value === char) {
+				queue.set(PositionUtils.toString(E.position), E.position);
 			}
 
-			if (eV?.toUpperCase() !== char) {
+			if (E.value?.toUpperCase() !== char) {
 				axis.y[p[1] + 0.5] ??= [];
 				axis.y[p[1] + 0.5].push(p);
 			}
 
-			if (sV === char) {
-				queue.set(PositionUtils.toString(sP), sP);
+			if (S.value === char) {
+				queue.set(PositionUtils.toString(S.position), S.position);
 			}
 
-			if (sV?.toUpperCase() !== char) {
+			if (S.value?.toUpperCase() !== char) {
 				axis.x[p[0] + 0.5] ??= [];
 				axis.x[p[0] + 0.5].push(p);
 			}
 
-			if (wV === char) {
-				queue.set(PositionUtils.toString(wP), wP);
+			if (W.value === char) {
+				queue.set(PositionUtils.toString(W.position), W.position);
 			}
 
-			if (wV?.toUpperCase() !== char) {
+			if (W.value?.toUpperCase() !== char) {
 				axis.y[p[1] - 0.5] ??= [];
 				axis.y[p[1] - 0.5].push(p);
 			}

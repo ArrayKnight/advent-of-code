@@ -1,6 +1,35 @@
 import type { Grid, Position } from "./types";
 
 export const GridUtils = {
+	adjacent: <T = string>(grid: Grid<T>, position: Position) => {
+		const nP = PositionUtils.ahead.N(position);
+		const nV = GridUtils.get(grid, nP);
+		const eP = PositionUtils.ahead.E(position);
+		const eV = GridUtils.get(grid, eP);
+		const sP = PositionUtils.ahead.S(position);
+		const sV = GridUtils.get(grid, sP);
+		const wP = PositionUtils.ahead.W(position);
+		const wV = GridUtils.get(grid, wP);
+
+		return {
+			N: {
+				position: nP,
+				value: nV,
+			},
+			E: {
+				position: eP,
+				value: eV,
+			},
+			S: {
+				position: sP,
+				value: sV,
+			},
+			W: {
+				position: wP,
+				value: wV,
+			},
+		};
+	},
 	clone: <T = string>(grid: Grid<T>): Grid<T> => grid.map((row) => [...row]),
 	get: <T = string>(grid: Grid<T>, [y, x]: Position) => grid[y]?.[x],
 	find: (grid: Grid<unknown>, value: unknown): Position | null => {

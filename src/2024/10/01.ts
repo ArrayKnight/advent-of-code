@@ -24,29 +24,22 @@ export default (grid: Grid<number>) => {
 		}
 
 		const next = value + 1;
-		const nP = PositionUtils.ahead.N(latest);
-		const nV = GridUtils.get(grid, nP);
-		const eP = PositionUtils.ahead.E(latest);
-		const eV = GridUtils.get(grid, eP);
-		const sP = PositionUtils.ahead.S(latest);
-		const sV = GridUtils.get(grid, sP);
-		const wP = PositionUtils.ahead.W(latest);
-		const wV = GridUtils.get(grid, wP);
+		const { N, E, S, W } = GridUtils.adjacent(grid, latest);
 
-		if (nV === next) {
-			walk(start, nP, nV);
+		if (N.value === next) {
+			walk(start, N.position, N.value);
 		}
 
-		if (eV === next) {
-			walk(start, eP, eV);
+		if (E.value === next) {
+			walk(start, E.position, E.value);
 		}
 
-		if (sV === next) {
-			walk(start, sP, sV);
+		if (S.value === next) {
+			walk(start, S.position, S.value);
 		}
 
-		if (wV === next) {
-			walk(start, wP, wV);
+		if (W.value === next) {
+			walk(start, W.position, W.value);
 		}
 	}
 
