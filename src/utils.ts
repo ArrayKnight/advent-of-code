@@ -1,4 +1,27 @@
-import type { Grid, Position } from "./types";
+import type { Direction, Grid, Position } from "./types";
+
+export const DirectionUtils = {
+	CW: {
+		N: "E",
+		E: "S",
+		S: "W",
+		W: "N",
+		"^": ">",
+		">": "v",
+		v: "<",
+		"<": "^",
+	} satisfies Record<Direction, Direction>,
+	CCW: {
+		N: "W",
+		W: "S",
+		S: "E",
+		E: "N",
+		"^": "<",
+		"<": "v",
+		v: ">",
+		">": "^",
+	} satisfies Record<Direction, Direction>,
+};
 
 export const GridUtils = {
 	adjacent: <T = string>(grid: Grid<T>, position: Position) => {
@@ -111,10 +134,7 @@ export const GridUtils = {
 
 type PositionUtilsType = {
 	add: (a: Position, b: Position) => Position;
-	ahead: Record<
-		"N" | "E" | "S" | "W" | "^" | ">" | "v" | "<",
-		(position: Position) => Position
-	>;
+	ahead: Record<Direction, (position: Position) => Position>;
 	equals: (a: Position, b: Position) => boolean;
 	inBounds: (position: Position, max: Position, min?: Position) => boolean;
 	sub: (a: Position, b: Position) => Position;

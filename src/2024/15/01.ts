@@ -1,12 +1,10 @@
-import type { Grid, Position } from "../../types";
+import type { ArrowDirection, Grid, Position } from "../../types";
 import { GridUtils, PositionUtils } from "../../utils";
 
 type Input = {
 	grid: Grid;
-	instructions: string[];
+	instructions: ArrowDirection[];
 };
-
-type Direction = "^" | ">" | "v" | "<";
 
 export default ({ grid, instructions }: Input) => {
 	let position = GridUtils.find(grid, "@");
@@ -14,7 +12,7 @@ export default ({ grid, instructions }: Input) => {
 	if (!position) return;
 
 	i: for (const instruction of instructions) {
-		const next = PositionUtils.ahead[instruction as Direction](position);
+		const next = PositionUtils.ahead[instruction](position);
 		const char = GridUtils.get(grid, next);
 
 		if (char === "#") {
@@ -42,7 +40,7 @@ export default ({ grid, instructions }: Input) => {
 		}
 
 		for (const [, p] of evaluating) {
-			const n = PositionUtils.ahead[instruction as Direction](p);
+			const n = PositionUtils.ahead[instruction](p);
 			const c = GridUtils.get(grid, n);
 
 			if (c === "#") {

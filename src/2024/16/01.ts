@@ -1,29 +1,18 @@
-import type { Grid, Position } from "../../types";
-import { GridUtils, PositionUtils } from "../../utils";
-
-type Direction = "N" | "E" | "S" | "W";
+import type { CardinalDirection, Grid, Position } from "../../types";
+import { DirectionUtils, GridUtils, PositionUtils } from "../../utils";
 
 type Step = {
 	position: Position;
-	direction: Direction;
+	direction: CardinalDirection;
 };
 
-type Cost = Record<Direction, Record<Direction, number | null> | null>;
+type Cost = Record<
+	CardinalDirection,
+	Record<CardinalDirection, number | null> | null
+>;
 
 type Marker = { step: Step; score: number };
 
-const CW: Record<Direction, Direction> = {
-	N: "E",
-	E: "S",
-	S: "W",
-	W: "N",
-};
-const CCW: Record<Direction, Direction> = {
-	N: "W",
-	W: "S",
-	S: "E",
-	E: "N",
-};
 const MAX = Number.POSITIVE_INFINITY;
 const SCORE = {
 	move: 1,
@@ -126,12 +115,14 @@ export default (grid: Grid) => {
 				score: score + (cost?.[direction]?.[direction] ?? MAX),
 			},
 			{
-				step: { position: position, direction: CW[direction] },
-				score: score + (cost?.[CW[direction]]?.[direction] ?? MAX),
+				step: { position: position, direction: DirectionUtils.CW[direction] },
+				score:
+					score + (cost?.[DirectionUtils.CW[direction]]?.[direction] ?? MAX),
 			},
 			{
-				step: { position: position, direction: CCW[direction] },
-				score: score + (cost?.[CCW[direction]]?.[direction] ?? MAX),
+				step: { position: position, direction: DirectionUtils.CCW[direction] },
+				score:
+					score + (cost?.[DirectionUtils.CCW[direction]]?.[direction] ?? MAX),
 			},
 		];
 

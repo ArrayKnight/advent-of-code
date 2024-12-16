@@ -1,19 +1,10 @@
-import type { Grid, Position } from "../../types";
-import { GridUtils, PositionUtils } from "../../utils";
-
-type Direction = "^" | ">" | "v" | "<";
+import type { ArrowDirection, Grid, Position } from "../../types";
+import { DirectionUtils, GridUtils, PositionUtils } from "../../utils";
 
 type Block = {
 	block: Position;
 	position: Position;
-	direction: Direction;
-};
-
-const turns: Record<Direction, Direction> = {
-	"^": ">",
-	">": "v",
-	v: "<",
-	"<": "^",
+	direction: ArrowDirection;
 };
 
 export default (grid: Grid) => {
@@ -34,7 +25,7 @@ export default (grid: Grid) => {
 	function walk(start: Position, block?: Block) {
 		const g = block ? placeBlock(block.block) : grid;
 		let p: Position = [...(block?.position ?? start)];
-		let d: Direction = block?.direction ?? "^";
+		let d: ArrowDirection = block?.direction ?? "^";
 		const steps: Record<string, boolean> = {
 			[PositionUtils.toString(p, block ? d : undefined)]: true,
 		};
@@ -43,7 +34,7 @@ export default (grid: Grid) => {
 			const next = PositionUtils.ahead[d](p);
 
 			if (GridUtils.get(g, next) === "#") {
-				d = turns[d];
+				d = DirectionUtils.CW[d];
 			} else {
 				if (!block) {
 					steps[PositionUtils.toString(p)] = true;

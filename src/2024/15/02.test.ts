@@ -1,4 +1,5 @@
 import { expect, it } from "vitest";
+import type { ArrowDirection } from "../../types";
 import { GridUtils, TimeUtils } from "../../utils";
 import func from "./01";
 
@@ -27,7 +28,9 @@ function process(input: string) {
 				return [];
 			}),
 		),
-		instructions: instructions.split("\n").flatMap((line) => line.split("")),
+		instructions: instructions
+			.split("\n")
+			.flatMap((line) => line.split("")) as ArrowDirection[],
 	};
 }
 
