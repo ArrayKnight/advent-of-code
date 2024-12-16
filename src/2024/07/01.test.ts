@@ -4,6 +4,11 @@ import func from "./01";
 
 const options = { separator: /:?\s/, callback: Number };
 
+const operators = [
+	(a: number, b: number) => a + b,
+	(a: number, b: number) => a * b,
+];
+
 const example = GridUtils.parse(
 	`190: 10 19
 3267: 81 40 27
@@ -18,7 +23,7 @@ const example = GridUtils.parse(
 );
 
 it("should pass example", () => {
-	expect(TimeUtils.log(() => func(example))).toBe(3749);
+	expect(TimeUtils.log(() => func(example, operators))).toBe(3749);
 });
 
 const challenge = GridUtils.parse(
@@ -876,5 +881,5 @@ const challenge = GridUtils.parse(
 );
 
 it("should pass challenge", () => {
-	expect(TimeUtils.log(() => func(challenge))).toBe(6231007345478);
+	expect(TimeUtils.log(() => func(challenge, operators))).toBe(6231007345478);
 });

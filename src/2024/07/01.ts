@@ -1,6 +1,8 @@
 import type { Grid } from "../../types";
 
-function canProduce(total: number, values: number[]) {
+type Operator = (a: number, b: number) => number;
+
+function canProduce(total: number, values: number[], operators: Operator[]) {
 	let totals = [values[0]];
 
 	for (let i = 1; i < values.length; i++) {
@@ -9,10 +11,10 @@ function canProduce(total: number, values: number[]) {
 
 		for (let j = 0; j < totals.length; j++) {
 			const subtotal = totals[j];
-			const sum = subtotal + value;
-			const product = subtotal * value;
 
-			subtotals.push(sum, product);
+			for (const operator of operators) {
+				subtotals.push(operator(subtotal, value));
+			}
 		}
 
 		totals = subtotals;
@@ -21,10 +23,10 @@ function canProduce(total: number, values: number[]) {
 	return totals.includes(total);
 }
 
-export default (grid: Grid<number>) => {
+export default (grid: Grid<number>, operators: Operator[]) => {
 	return grid.reduce((acc, line) => {
 		const [total, ...values] = line;
 
-		return acc + (canProduce(total, values) ? total : 0);
+		return acc + (canProduce(total, values, operators) ? total : 0);
 	}, 0);
 };

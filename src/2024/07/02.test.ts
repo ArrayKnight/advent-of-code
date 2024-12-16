@@ -1,8 +1,14 @@
 import { expect, it } from "vitest";
 import { GridUtils, TimeUtils } from "../../utils";
-import func from "./02";
+import func from "./01";
 
 const options = { separator: /:?\s/, callback: Number };
+
+const operators = [
+	(a: number, b: number) => a + b,
+	(a: number, b: number) => a * b,
+	(a: number, b: number) => Number(`${a}${b}`),
+];
 
 const example = GridUtils.parse(
 	`190: 10 19
@@ -18,7 +24,7 @@ const example = GridUtils.parse(
 );
 
 it("should pass example", () => {
-	expect(TimeUtils.log(() => func(example))).toBe(11387);
+	expect(TimeUtils.log(() => func(example, operators))).toBe(11387);
 });
 
 const challenge = GridUtils.parse(
@@ -876,5 +882,5 @@ const challenge = GridUtils.parse(
 );
 
 it("should pass challenge", () => {
-	expect(TimeUtils.log(() => func(challenge))).toBe(333027885676693);
+	expect(TimeUtils.log(() => func(challenge, operators))).toBe(333027885676693);
 });
