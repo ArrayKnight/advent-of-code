@@ -110,15 +110,17 @@ export default (grid: Grid) => {
 		};
 	}
 
-	let cost = 0;
+	return GridUtils.reduce(
+		grid,
+		(acc, value, position) => {
+			if (value === value.toUpperCase()) {
+				const { area, sides } = collect(position, value);
 
-	GridUtils.forEach(grid, (value, position) => {
-		if (value === value.toUpperCase()) {
-			const { area, sides } = collect(position, value);
+				return acc + area * sides;
+			}
 
-			cost += area * sides;
-		}
-	});
-
-	return cost;
+			return acc;
+		},
+		0,
+	);
 };

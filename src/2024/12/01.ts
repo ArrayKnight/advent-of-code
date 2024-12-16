@@ -70,15 +70,17 @@ export default (grid: Grid) => {
 		return { area: positions.size, perimeter };
 	}
 
-	let cost = 0;
+	return GridUtils.reduce(
+		grid,
+		(acc, value, position) => {
+			if (value === value.toUpperCase()) {
+				const { area, perimeter } = collect(position, value);
 
-	GridUtils.forEach(grid, (value, position) => {
-		if (value === value.toUpperCase()) {
-			const { area, perimeter } = collect(position, value);
+				return acc + area * perimeter;
+			}
 
-			cost += area * perimeter;
-		}
-	});
-
-	return cost;
+			return acc;
+		},
+		0,
+	);
 };

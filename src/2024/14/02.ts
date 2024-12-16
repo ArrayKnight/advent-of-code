@@ -8,7 +8,6 @@ type Robot = {
 
 export default (robots: Robot[], size: Position, display?: boolean) => {
 	const [height, width] = size;
-	let i = 0;
 
 	function areTree() {
 		const positions: Record<number, Record<number, boolean>> = {};
@@ -41,6 +40,8 @@ export default (robots: Robot[], size: Position, display?: boolean) => {
 
 		return found;
 	}
+
+	let i = 0;
 
 	while (!areTree()) {
 		i++;

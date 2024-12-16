@@ -31,7 +31,9 @@ export default ({ grid, instructions }: Input) => {
 		if (char === ".") {
 			GridUtils.set(grid, next, "@");
 			GridUtils.set(grid, position, ".");
+
 			position = next;
+
 			continue;
 		}
 
