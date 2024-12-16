@@ -152,9 +152,9 @@ export default (grid: Grid) => {
 				option.step.position,
 				option.step.direction,
 			);
-			const existing = markers.get(key);
+			const marker = markers.get(key);
 
-			if (!existing || option.score < existing.score) {
+			if (!marker || option.score < marker.score) {
 				markers.set(key, option);
 				active.push(option);
 			}
