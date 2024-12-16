@@ -35,14 +35,13 @@ export default ({ grid, instructions }: Input) => {
 			continue;
 		}
 
-		let sibling: Position;
 		const evaluating = new Map<string, Position>([
 			[PositionUtils.toString(next), next],
 		]);
 		const moving = new Map<string, [Position, Position, string]>();
 
 		if (char === "[" || char === "]") {
-			sibling = ahead[char === "[" ? ">" : "<"](next);
+			const sibling = ahead[char === "[" ? ">" : "<"](next);
 
 			evaluating.set(PositionUtils.toString(sibling), sibling);
 		}
@@ -62,7 +61,7 @@ export default ({ grid, instructions }: Input) => {
 			}
 
 			if (c === "[" || c === "]") {
-				sibling = ahead[c === "[" ? ">" : "<"](n);
+				const sibling = ahead[c === "[" ? ">" : "<"](n);
 
 				evaluating.set(PositionUtils.toString(sibling), sibling);
 			}
