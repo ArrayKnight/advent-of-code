@@ -54,6 +54,35 @@ export const GridUtils = {
 		};
 	},
 	clone: <T = string>(grid: Grid<T>): Grid<T> => grid.map((row) => [...row]),
+	diagonal: <T = string>(grid: Grid<T>, position: Position) => {
+		const neP = PositionUtils.ahead.NE(position);
+		const neV = GridUtils.get(grid, neP);
+		const seP = PositionUtils.ahead.SE(position);
+		const seV = GridUtils.get(grid, seP);
+		const swP = PositionUtils.ahead.SW(position);
+		const swV = GridUtils.get(grid, swP);
+		const nwP = PositionUtils.ahead.NW(position);
+		const nwV = GridUtils.get(grid, nwP);
+
+		return {
+			NE: {
+				position: neP,
+				value: neV,
+			},
+			SE: {
+				position: seP,
+				value: seV,
+			},
+			SW: {
+				position: swP,
+				value: swV,
+			},
+			NW: {
+				position: nwP,
+				value: nwV,
+			},
+		};
+	},
 	get: <T = string>(grid: Grid<T>, [y, x]: Position) => grid[y]?.[x],
 	find: (grid: Grid<unknown>, value: unknown): Position | null => {
 		let position: Position | null = null;
@@ -134,7 +163,10 @@ export const GridUtils = {
 
 type PositionUtilsType = {
 	add: (a: Position, b: Position) => Position;
-	ahead: Record<Direction, (position: Position) => Position>;
+	ahead: Record<
+		Direction | "NE" | "SE" | "SW" | "NW",
+		(position: Position) => Position
+	>;
 	equals: (a: Position, b: Position) => boolean;
 	inBounds: (position: Position, max: Position, min?: Position) => boolean;
 	sub: (a: Position, b: Position) => Position;
@@ -144,14 +176,18 @@ type PositionUtilsType = {
 export const PositionUtils: PositionUtilsType = {
 	add: ([aY, aX], [bY, bX]) => [aY + bY, aX + bX],
 	ahead: {
-		N: (position) => PositionUtils.sub(position, [1, 0]),
+		N: (position) => PositionUtils.add(position, [-1, 0]),
+		NE: (position) => PositionUtils.add(position, [-1, 1]),
 		E: (position) => PositionUtils.add(position, [0, 1]),
+		SE: (position) => PositionUtils.add(position, [1, 1]),
 		S: (position) => PositionUtils.add(position, [1, 0]),
-		W: (position) => PositionUtils.sub(position, [0, 1]),
-		"^": (position) => PositionUtils.sub(position, [1, 0]),
-		">": (position) => PositionUtils.add(position, [0, 1]),
-		v: (position) => PositionUtils.add(position, [1, 0]),
-		"<": (position) => PositionUtils.sub(position, [0, 1]),
+		SW: (position) => PositionUtils.add(position, [1, -1]),
+		W: (position) => PositionUtils.add(position, [0, -1]),
+		NW: (position) => PositionUtils.add(position, [-1, -1]),
+		"^": (position) => PositionUtils.ahead.N(position),
+		">": (position) => PositionUtils.ahead.E(position),
+		v: (position) => PositionUtils.ahead.S(position),
+		"<": (position) => PositionUtils.ahead.W(position),
 	},
 	equals: ([aY, aX], [bY, bX]) => aY === bY && aX === bX,
 	inBounds: ([y, x], [MY, MX], [mY, mX] = [0, 0]) =>
