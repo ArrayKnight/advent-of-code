@@ -43,7 +43,8 @@ export default ({ register: { B, C }, program }: Input) => {
 		}
 	}
 
-	answers.sort((a, b) => Number(a - b));
-
-	return answers[0];
+	return answers.reduce(
+		(acc, value) => (value < acc ? value : acc),
+		BigInt(Number.MAX_SAFE_INTEGER),
+	);
 };
