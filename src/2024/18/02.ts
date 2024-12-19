@@ -3,18 +3,18 @@ import { GridUtils, PositionUtils } from "../../utils";
 
 type Path = {
 	position: Position;
-	positions: Record<string, boolean>;
+	positions: Set<string>;
 	steps: number;
 };
 
-function isPassable(grid: Grid<boolean>) {
+function findPath(grid: Grid<boolean>) {
 	const size = GridUtils.size(grid);
 	const start: Position = [0, 0];
 	const end = PositionUtils.sub(size, [1, 1]);
 	const paths: Path[] = [
 		{
 			position: start,
-			positions: { [PositionUtils.toString(start)]: true },
+			positions: new Set([PositionUtils.toString(start)]),
 			steps: 0,
 		},
 	];
@@ -39,10 +39,10 @@ function isPassable(grid: Grid<boolean>) {
 
 		const adjacent = GridUtils.adjacent(grid, position);
 		const directions = Object.values(adjacent);
-		const positions = {
+		const positions = new Set([
 			...path.positions,
-			[PositionUtils.toString(position)]: true,
-		};
+			PositionUtils.toString(position),
+		]);
 
 		for (const D of directions) {
 			if (D.value) {
@@ -63,7 +63,7 @@ export default (blocks: Position[], size: Position, count: number) => {
 	const grid: Grid<boolean> = Array.from({ length: height }, () =>
 		new Array(width).fill(true),
 	);
-	let positions: Record<string, boolean> | null | undefined = null;
+	let positions: Set<string> | null | undefined = null;
 
 	for (let i = 0; i < blocks.length; i++) {
 		const position = blocks[i];
@@ -72,28 +72,31 @@ export default (blocks: Position[], size: Position, count: number) => {
 
 		if (
 			i < count ||
-			(positions && !positions[PositionUtils.toString(position)])
+			(positions && !positions.has(PositionUtils.toString(position)))
 		) {
 			continue;
 		}
 
 		const { N, E, S, W } = GridUtils.adjacent(grid, position);
 		const { NE, SE, SW, NW } = GridUtils.diagonal(grid, position);
-		const blocked = [
-			[N, S],
-			[E, W],
-			[NE, SW],
-			[NW, SE],
-		].some(([a, b]) => !a.value && !b.value);
 
-		if (blocked) {
-			positions = isPassable(grid);
+		if (
+			[
+				[N, S],
+				[E, W],
+				[NE, SW],
+				[NW, SE],
+			].every(([a, b]) => a.value || b.value)
+		) {
+			continue;
+		}
 
-			if (!positions) {
-				const [y, x] = position;
+		positions = findPath(grid);
 
-				return PositionUtils.toString([x, y]);
-			}
+		if (!positions) {
+			const [y, x] = position;
+
+			return PositionUtils.toString([x, y]);
 		}
 	}
 };
