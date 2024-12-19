@@ -10,12 +10,12 @@ export default (blocks: Position[], size: Position, count: number) => {
 	const [height, width] = size;
 	const start: Position = [0, 0];
 	const end = PositionUtils.sub(size, [1, 1]);
-	const grid: Grid<string> = Array.from({ length: height }, () =>
-		new Array(width).fill("."),
+	const grid: Grid<boolean> = Array.from({ length: height }, () =>
+		new Array(width).fill(true),
 	);
 
 	for (let i = 0; i < count; i++) {
-		GridUtils.set(grid, blocks[i], "#");
+		GridUtils.set(grid, blocks[i], false);
 	}
 
 	const paths: Path[] = [
@@ -47,7 +47,7 @@ export default (blocks: Position[], size: Position, count: number) => {
 		const directions = Object.values(adjacent);
 
 		for (const D of directions) {
-			if (D.value && D.value !== "#") {
+			if (D.value) {
 				paths.push({
 					position: D.position,
 					steps: steps + 1,

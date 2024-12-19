@@ -1,4 +1,4 @@
-import type { Direction, Grid, Position } from "./types";
+import type { CardinalDiagonal, Direction, Grid, Position } from "./types";
 
 export const DirectionUtils = {
 	CW: {
@@ -163,10 +163,7 @@ export const GridUtils = {
 
 type PositionUtilsType = {
 	add: (a: Position, b: Position) => Position;
-	ahead: Record<
-		Direction | "NE" | "SE" | "SW" | "NW",
-		(position: Position) => Position
-	>;
+	ahead: Record<Direction | CardinalDiagonal, (position: Position) => Position>;
 	equals: (a: Position, b: Position) => boolean;
 	inBounds: (position: Position, max: Position, min?: Position) => boolean;
 	sub: (a: Position, b: Position) => Position;
