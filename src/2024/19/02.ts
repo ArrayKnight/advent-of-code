@@ -8,34 +8,28 @@ export default ({ designs, patterns }: Input) => {
 		const indexed: string[][] = new Array(design.length);
 
 		for (const pattern of patterns) {
-			let copy = design;
-			let match: RegExpExecArray | null;
+			let i = 0;
 
 			// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-			while ((match = new RegExp(pattern, "g").exec(copy))) {
-				indexed[match.index + (design.length - copy.length)] ??= [];
-				indexed[match.index + (design.length - copy.length)].push(pattern);
-
-				copy = copy.slice(match.index + 1);
+			while ((i = design.indexOf(pattern, i)) >= 0) {
+				indexed[i] ??= [];
+				indexed[i].push(pattern);
+				i++;
 			}
 		}
 
-		const attempts = new Map([["", 1]]);
+		const counts = new Map([["", 1]]);
 
-		for (let i = 0; i <= design.length; i++) {
+		for (let i = 0; i < design.length; i++) {
 			const str = design.slice(0, i);
-			const count = attempts.get(str) ?? 0;
-			const strings = indexed[str.length];
-
-			if (str === design) return acc + count;
-
-			if (!strings) continue;
+			const count = counts.get(str) ?? 0;
+			const strings = indexed[str.length] ?? [];
 
 			for (const s of strings) {
-				attempts.set(str + s, (attempts.get(str + s) ?? 0) + count);
+				counts.set(str + s, (counts.get(str + s) ?? 0) + count);
 			}
 		}
 
-		return acc;
+		return acc + (counts.get(design) ?? 0);
 	}, 0);
 };
