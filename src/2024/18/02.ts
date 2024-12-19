@@ -70,7 +70,12 @@ export default (blocks: Position[], size: Position, count: number) => {
 
 		GridUtils.set(grid, position, false);
 
-		if (i < count) continue;
+		if (
+			i < count ||
+			(positions && !positions[PositionUtils.toString(position)])
+		) {
+			continue;
+		}
 
 		const { N, E, S, W } = GridUtils.adjacent(grid, position);
 		const { NE, SE, SW, NW } = GridUtils.diagonal(grid, position);
@@ -81,17 +86,14 @@ export default (blocks: Position[], size: Position, count: number) => {
 			[NW, SE],
 		].some(([a, b]) => !a.value && !b.value);
 
-		if (
-			blocked &&
-			(!positions || positions[PositionUtils.toString(position)])
-		) {
+		if (blocked) {
 			positions = isPassable(grid);
-		}
 
-		if (blocked && !positions) {
-			const [y, x] = position;
+			if (!positions) {
+				const [y, x] = position;
 
-			return PositionUtils.toString([x, y]);
+				return PositionUtils.toString([x, y]);
+			}
 		}
 	}
 };
