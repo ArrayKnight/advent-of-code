@@ -23,10 +23,12 @@ export default ({ designs, patterns }: Input) => {
 		for (let i = 0; i < design.length; i++) {
 			const str = design.slice(0, i);
 			const count = counts.get(str) ?? 0;
-			const strings = indexed[str.length] ?? [];
+			const patterns = indexed[str.length] ?? [];
 
-			for (const s of strings) {
-				counts.set(str + s, (counts.get(str + s) ?? 0) + count);
+			for (const pattern of patterns) {
+				const key = str + pattern;
+
+				counts.set(key, (counts.get(key) ?? 0) + count);
 			}
 		}
 

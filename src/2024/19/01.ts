@@ -18,19 +18,21 @@ export default ({ designs, patterns }: Input) => {
 			}
 		}
 
-		const attempts = [""];
+		const strings = [""];
 
-		while (attempts.length) {
-			const str = attempts.pop();
+		while (strings.length) {
+			const str = strings.pop();
 
 			if (str === undefined) return acc;
 
 			if (str === design) return acc + 1;
 
-			if (str.length >= design.length || !indexed[str.length]) continue;
+			if (str.length >= design.length) continue;
 
-			for (const s of indexed[str.length]) {
-				attempts.push(str + s);
+			const patterns = indexed[str.length] ?? [];
+
+			for (const pattern of patterns) {
+				strings.push(str + pattern);
 			}
 		}
 
