@@ -4,7 +4,6 @@ import { GridUtils, PositionUtils } from "../../utils";
 type Path = {
 	position: Position;
 	positions: Map<string, Position>;
-	steps: number;
 };
 
 function findPath(grid: Grid, start: Position, end: Position) {
@@ -12,7 +11,6 @@ function findPath(grid: Grid, start: Position, end: Position) {
 		{
 			position: start,
 			positions: new Map([[PositionUtils.toString(start), start]]),
-			steps: 0,
 		},
 	];
 	const visited = new Set<string>();
@@ -22,7 +20,7 @@ function findPath(grid: Grid, start: Position, end: Position) {
 
 		if (!path) return;
 
-		const { position, steps } = path;
+		const { position } = path;
 
 		if (visited.has(PositionUtils.toString(position))) {
 			continue;
@@ -46,7 +44,6 @@ function findPath(grid: Grid, start: Position, end: Position) {
 				paths.push({
 					position: D.position,
 					positions,
-					steps: steps + 1,
 				});
 			}
 		}
@@ -55,39 +52,37 @@ function findPath(grid: Grid, start: Position, end: Position) {
 	return null;
 }
 
+const multiples = [
+	[1, 1],
+	[1, -1],
+	[-1, 1],
+	[-1, -1],
+];
+
 function findAllShortcuts(grid: Grid, position: Position, cheats: number) {
+	const size = GridUtils.size(grid);
 	const positions = new Map<string, [Position, number]>();
-	const visited = new Set<string>();
-	const active = [{ position, value: GridUtils.get(grid, position) }];
 
-	for (let i = 0; i <= cheats; i++) {
-		const length = active.length;
+	function add([dY, dX]: Position) {
+		const dist = dY + dX;
 
-		for (let j = 0; j < length; j++) {
-			const step = active.shift();
+		if (dist > cheats) return;
 
-			if (!step) return positions;
+		for (const [mY, mX] of multiples) {
+			const pos = PositionUtils.add(position, [dY * mY, dX * mX]);
 
-			const key = PositionUtils.toString(step.position);
-
-			if (visited.has(key)) continue;
-
-			visited.add(key);
-
-			if (i > 1 && step.value !== "#" && !positions.has(key)) {
-				positions.set(key, [step.position, i]);
+			if (
+				PositionUtils.inBounds(pos, size) &&
+				GridUtils.get(grid, pos) !== "#"
+			) {
+				positions.set(PositionUtils.toString(pos), [pos, dist]);
 			}
+		}
+	}
 
-			if (i === cheats) continue;
-
-			const { N, E, S, W } = GridUtils.adjacent(grid, step.position);
-			const directions = [N, E, S, W];
-
-			for (const D of directions) {
-				if (D.value) {
-					active.push(D);
-				}
-			}
+	for (let dY = 0; dY <= cheats; dY++) {
+		for (let dX = 0; dX <= cheats; dX++) {
+			add([dY, dX]);
 		}
 	}
 
