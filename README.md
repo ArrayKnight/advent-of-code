@@ -1,1 +1,1 @@
-`pnpm [dev|test|test:watch] [path to file]`
+`bun [test|test:watch] [path to file]`

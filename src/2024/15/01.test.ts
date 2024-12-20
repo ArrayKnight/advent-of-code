@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { expect, it } from "bun:test";
 import type { ArrowDirection } from "../../types";
 import { GridUtils, TimeUtils } from "../../utils";
 import func from "./01";
