@@ -1,16 +1,17 @@
 {
-  "$schema": "https://json.schemastore.org/package",
-  "name": "advent-of-code",
-  "type": "module",
-  "scripts": {
-    "test": "bun test",
-    "test:watch": "bun test --watch"
-  },
-  "dependencies": {
-    "typescript": "^5.7.2"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@types/bun": "^1.1.14"
-  }
+	"$schema": "https://json.schemastore.org/package",
+	"name": "advent-of-code",
+	"type": "module",
+	"scripts": {
+		"test": "bun test",
+		"test:watch": "bun test --watch"
+	},
+	"dependencies": {
+		"typescript": "^5.7.2"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/bun": "^1.1.14"
+	},
+	"packageManager": "bun@1.1.40"
 }
