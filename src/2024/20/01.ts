@@ -1,55 +1,30 @@
 import type { Grid, Position } from "../../types";
 import { GridUtils, PositionUtils } from "../../utils";
 
-type Path = {
-	position: Position;
-	positions: Map<string, Position>;
-};
-
 function findPath(grid: Grid, start: Position, end: Position) {
-	const paths: Path[] = [
-		{
-			position: start,
-			positions: new Map([[PositionUtils.toString(start), start]]),
-		},
-	];
-	const visited = new Set<string>();
+	let position = start;
+	const positions = new Map<string, Position>();
 
-	while (paths.length) {
-		const path = paths.shift();
+	while (!PositionUtils.equals(position, end)) {
+		positions.set(PositionUtils.toString(position), position);
 
-		if (!path) return;
-
-		const { position } = path;
-
-		if (visited.has(PositionUtils.toString(position))) {
-			continue;
-		}
-
-		visited.add(PositionUtils.toString(position));
-
-		if (PositionUtils.equals(position, end)) {
-			return path.positions;
-		}
-
-		const adjacent = GridUtils.adjacent(grid, position);
-		const directions = Object.values(adjacent);
-		const positions = new Map([
-			...path.positions,
-			[PositionUtils.toString(position), position],
-		]);
+		const { N, E, S, W } = GridUtils.adjacent(grid, position);
+		const directions = [N, E, S, W];
 
 		for (const D of directions) {
-			if (D.value && D.value !== "#") {
-				paths.push({
-					position: D.position,
-					positions,
-				});
+			if (
+				D.value &&
+				D.value !== "#" &&
+				!positions.has(PositionUtils.toString(D.position))
+			) {
+				position = D.position;
 			}
 		}
 	}
 
-	return null;
+	positions.set(PositionUtils.toString(end), end);
+
+	return positions;
 }
 
 const multiples = [
@@ -100,16 +75,16 @@ export default (grid: Grid, cheats: number, threshold: number) => {
 	if (!path) return 0;
 
 	const length = path.size;
-	const lengths = new Map<string, number>([[PositionUtils.toString(end), 0]]);
+	const lengths = new Map<string, number>(
+		path
+			.values()
+			.map((position, index) => [
+				PositionUtils.toString(position),
+				length - index,
+			]),
+	);
 	let count = 0;
-	let i = 0;
-
-	for (const [, enter] of path) {
-		lengths.set(PositionUtils.toString(enter), length - i);
-		i++;
-	}
-
-	i = 0;
+	let step = 0;
 
 	for (const [, enter] of path) {
 		if ((lengths.get(PositionUtils.toString(enter)) ?? 0) < threshold) break;
@@ -121,7 +96,7 @@ export default (grid: Grid, cheats: number, threshold: number) => {
 
 			if (c == null) continue;
 
-			const combined = i + b + c;
+			const combined = step + b + c;
 			const delta = length - combined;
 
 			if (delta >= threshold) {
@@ -129,7 +104,7 @@ export default (grid: Grid, cheats: number, threshold: number) => {
 			}
 		}
 
-		i++;
+		step++;
 	}
 
 	return count;
