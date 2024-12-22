@@ -13,5 +13,5 @@ const challenge = process(`964A
 180A`);
 
 it("should pass challenge", () => {
-	expect(TimeUtils.log(() => func(challenge, 26))).toBe(null);
+	expect(TimeUtils.log(() => func(challenge, 25))).toBe(258263972600402);
 });

@@ -48,16 +48,16 @@ function countDirectionChanges(directions: string) {
 	return changes;
 }
 
-const numericCache = new Map<string, Path>();
-const directionalCache = new Map<string, Path>();
+const numericCache = new Map<string, string>();
+const directionalCache = new Map<string, string>();
 
-function findPath(grid: Grid, a: string, b: string) {
-	const isNumeric = grid === numericKeypad;
+function findPath(keypad: Grid, a: string, b: string) {
+	const isNumeric = keypad === numericKeypad;
 	const cache = isNumeric ? numericCache : directionalCache;
 	const key = `${a}:${b}`;
 
 	if (cache.has(key)) {
-		return cache.get(key);
+		return cache.get(key) ?? "";
 	}
 
 	const positions = isNumeric ? numericPositions : directionalPositions;
@@ -75,7 +75,7 @@ function findPath(grid: Grid, a: string, b: string) {
 	while (paths.length) {
 		const path = paths.shift();
 
-		if (!path) return;
+		if (!path) return "";
 
 		const { position, directions } = path;
 
@@ -89,7 +89,7 @@ function findPath(grid: Grid, a: string, b: string) {
 			continue;
 		}
 
-		const { N, E, S, W } = GridUtils.adjacent(grid, position);
+		const { N, E, S, W } = GridUtils.adjacent(keypad, position);
 		const dirs: [{ position: Position; value: string }, ArrowDirection][] = [
 			[N, "^"],
 			[E, ">"],
@@ -126,30 +126,61 @@ function findPath(grid: Grid, a: string, b: string) {
 					: indexDownA - indexDownB;
 		});
 
-	cache.set(key, best);
+	cache.set(key, best.directions);
 
-	return best;
+	return best.directions;
 }
 
-function type(grid: Grid, start: string, sequence: string) {
-	let position = start;
-	let seq = "";
+function type(keypad: Grid, a: string, b: string) {
+	if (a === b) return "A";
 
-	for (const b of sequence) {
-		const path = findPath(grid, position, b);
+	const directions = findPath(keypad, a, b);
 
-		if (!path) continue;
+	return `${directions}A`;
+}
 
-		position = b;
+function count(
+	keypad: Grid,
+	a: string,
+	sequence: string,
+	depth: number,
+	cache: Map<string, number>,
+): number {
+	const key = `${a}:${sequence}:${depth}`;
+	let length = cache.get(key);
 
-		seq += path.directions;
-		seq += "A";
+	if (length != null) return length;
+
+	length = 0;
+
+	for (let i = 0; i < sequence.length; i++) {
+		const b = sequence[i];
+		const seq = type(keypad, a, b);
+
+		if (depth) {
+			let _a = "A";
+
+			for (let j = 0; j < seq.length; j++) {
+				const _b = seq[j];
+
+				length += count(directionalKeypad, _a, _b, depth - 1, cache);
+
+				_a = _b;
+			}
+		} else {
+			length = seq.length;
+		}
+
+		// biome-ignore lint/style/noParameterAssign: <explanation>
+		a = b;
 	}
 
-	return seq;
+	cache.set(key, length);
+
+	return length;
 }
 
-export default (codes: string[], robots: number) => {
+export default (codes: string[], depth: number) => {
 	GridUtils.forEach(numericKeypad, (a) => {
 		GridUtils.forEach(numericKeypad, (b) => {
 			if (a && b) {
@@ -166,15 +197,12 @@ export default (codes: string[], robots: number) => {
 		});
 	});
 
-	return codes.reduce((acc, code) => {
-		let sequence = code;
+	const cache = new Map<string, number>();
 
-		sequence = type(numericKeypad, "A", sequence);
-
-		for (let i = 0; i < robots; i++) {
-			sequence = type(directionalKeypad, "A", sequence);
-		}
-
-		return acc + Number(code.slice(0, 3)) * sequence.length;
-	}, 0);
+	return codes.reduce(
+		(acc, code) =>
+			acc +
+			Number(code.slice(0, 3)) * count(numericKeypad, "A", code, depth, cache),
+		0,
+	);
 };
