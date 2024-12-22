@@ -7,17 +7,36 @@ const numericKeypad: Grid = [
 	["1", "2", "3"],
 	["", "0", "A"],
 ];
+const numericPositions = GridUtils.reduce<Record<string, Position>>(
+	numericKeypad,
+	(acc, value, position) => {
+		acc[value] = position;
+
+		return acc;
+	},
+	{},
+);
+
 const directionalKeypad: Grid = [
 	["", "^", "A"],
 	["<", "v", ">"],
 ];
+const directionalPositions = GridUtils.reduce<Record<string, Position>>(
+	directionalKeypad,
+	(acc, value, position) => {
+		acc[value] = position;
+
+		return acc;
+	},
+	{},
+);
 
 type Path = {
 	position: Position;
-	directions: ArrowDirection[];
+	directions: string;
 };
 
-function countDirectionChanges(directions: ArrowDirection[]) {
+function countDirectionChanges(directions: string) {
 	let changes = 0;
 
 	for (let i = 1; i < directions.length; i++) {
@@ -29,23 +48,25 @@ function countDirectionChanges(directions: ArrowDirection[]) {
 	return changes;
 }
 
-const sequenceCache = new Map<string, Path>();
+const numericCache = new Map<string, Path>();
+const directionalCache = new Map<string, Path>();
 
-function findPath(grid: Grid, start: Position, target: string) {
-	const key = PositionUtils.toString(start, target);
+function findPath(grid: Grid, a: string, b: string) {
+	const isNumeric = grid === numericKeypad;
+	const cache = isNumeric ? numericCache : directionalCache;
+	const key = `${a}:${b}`;
 
-	if (grid === directionalKeypad && sequenceCache.has(key)) {
-		return sequenceCache.get(key);
+	if (cache.has(key)) {
+		return cache.get(key);
 	}
 
-	const end = GridUtils.find(grid, target);
-
-	if (!end) return;
-
+	const positions = isNumeric ? numericPositions : directionalPositions;
+	const start = positions[a];
+	const end = positions[b];
 	const paths: Path[] = [
 		{
 			position: start,
-			directions: [],
+			directions: "",
 		},
 	];
 	const complete: Path[] = [];
@@ -56,44 +77,34 @@ function findPath(grid: Grid, start: Position, target: string) {
 
 		if (!path) return;
 
-		const { position } = path;
+		const { position, directions } = path;
 
-		if (path.directions.length > length) continue;
+		if (directions.length > length) continue;
 
 		if (PositionUtils.equals(position, end)) {
 			complete.push(path);
-			length = Math.min(length, path.directions.length);
+
+			length = Math.min(length, directions.length);
 
 			continue;
 		}
 
 		const { N, E, S, W } = GridUtils.adjacent(grid, position);
-		const directions: [
-			{ position: Position; value: string },
-			ArrowDirection,
-		][] = [
+		const dirs: [{ position: Position; value: string }, ArrowDirection][] = [
 			[N, "^"],
 			[E, ">"],
 			[S, "v"],
 			[W, "<"],
 		];
 
-		for (const [D, arrow] of directions) {
+		for (const [D, arrow] of dirs) {
 			if (D.value) {
 				paths.push({
 					position: D.position,
-					directions: [...path.directions, arrow],
+					directions: `${directions}${arrow}`,
 				});
 			}
 		}
-	}
-
-	if (complete.length === 1) {
-		if (grid === directionalKeypad) {
-			sequenceCache.set(key, complete[0]);
-		}
-
-		return complete[0];
 	}
 
 	const [best] = complete
@@ -115,116 +126,53 @@ function findPath(grid: Grid, start: Position, target: string) {
 					: indexDownA - indexDownB;
 		});
 
-	if (grid === directionalKeypad) {
-		sequenceCache.set(key, best);
-	}
+	cache.set(key, best);
 
 	return best;
 }
 
-const routeCache = new Map<string, string[]>();
-
-function type(grid: Grid, start: Position, sequence: string[]) {
+function type(grid: Grid, start: string, sequence: string) {
 	let position = start;
-	const seq: string[] = [];
+	let seq = "";
 
 	for (const b of sequence) {
-		// if (grid === directionalKeypad) {
-		// 	const a = GridUtils.get(grid, position);
-		//
-		// 	if (!a) continue;
-		//
-		// 	const key = `${a}:${b}`;
-		//
-		// 	if (routeCache.has(key)) {
-		// 		seq.push(...(routeCache.get(key) ?? []));
-		//
-		// 		continue;
-		// 	}
-		//
-		// 	const path = findPath(grid, position, b);
-		//
-		// 	if (!path) continue;
-		//
-		// 	position = path.position;
-		//
-		// 	const route = (path.directions as string[]).concat(["A"]);
-		//
-		// 	seq.push(...route);
-		//
-		// 	routeCache.set(key, route);
-		// } else {
-		// 	const path = findPath(grid, position, b);
-		//
-		// 	if (!path) continue;
-		//
-		// 	position = path.position;
-		//
-		// 	seq.push(...path.directions, "A");
-		// }
-
 		const path = findPath(grid, position, b);
 
 		if (!path) continue;
 
-		position = path.position;
+		position = b;
 
-		seq.push(...path.directions, "A");
+		seq += path.directions;
+		seq += "A";
 	}
 
 	return seq;
 }
 
-function count(sequence: string[]) {
-	const counts = new Map<string, number>();
-
-	for (let i = 1; i < sequence.length; i++) {
-		const a = sequence[i - 1];
-		const b = sequence[i];
-		const key = `${a}:${b}`;
-
-		counts.set(key, (counts.get(key) ?? 0) + 1);
-	}
-
-	return counts;
-}
-
-function typeCount(counts: Map<string, number>) {}
-
 export default (codes: string[], robots: number) => {
-	const numStart = GridUtils.find(numericKeypad, "A");
-	const dirStart = GridUtils.find(directionalKeypad, "A");
-
-	if (!numStart || !dirStart) return 0;
-
-	GridUtils.forEach(directionalKeypad, (a, position) => {
-		GridUtils.forEach(directionalKeypad, (b) => {
+	GridUtils.forEach(numericKeypad, (a) => {
+		GridUtils.forEach(numericKeypad, (b) => {
 			if (a && b) {
-				type(directionalKeypad, position, [b]);
+				findPath(numericKeypad, a, b);
 			}
 		});
 	});
 
-	console.log(routeCache);
+	GridUtils.forEach(directionalKeypad, (a) => {
+		GridUtils.forEach(directionalKeypad, (b) => {
+			if (a && b) {
+				findPath(directionalKeypad, a, b);
+			}
+		});
+	});
 
 	return codes.reduce((acc, code) => {
-		let sequence = code.split("");
+		let sequence = code;
 
-		// console.log(sequence.join(""));
-		sequence = type(numericKeypad, numStart, sequence);
-		// console.log(sequence.join(""), sequence.length);
-
-		// let counts = count(type(numericKeypad, numStart, sequence));
-		// console.log(counts);
+		sequence = type(numericKeypad, "A", sequence);
 
 		for (let i = 0; i < robots; i++) {
-			// console.log(i, sequence.length);
-			sequence = type(directionalKeypad, dirStart, sequence);
-			// console.log(sequence.join(""), sequence.length);
-
-			// counts = typeCount(counts);
-
-			//console.log(counts);
+			sequence = type(directionalKeypad, "A", sequence);
 		}
 
 		return acc + Number(code.slice(0, 3)) * sequence.length;
