@@ -18,9 +18,11 @@ export default (secrets: bigint[]) => {
 			previous = current;
 			prev = curr;
 
-			if (diffs.length < 4) continue;
+			const length = diffs.length;
 
-			if (diffs.length > 4) {
+			if (length < 4) continue;
+
+			if (length > 4) {
 				diffs.shift();
 			}
 
@@ -29,10 +31,11 @@ export default (secrets: bigint[]) => {
 
 			if (indexOf.has(indexKey)) continue;
 
+			indexOf.set(indexKey, i);
+
 			const total = (totals.get(totalKey) ?? 0n) + curr;
 
 			totals.set(totalKey, total);
-			indexOf.set(indexKey, i);
 
 			if (total > best) {
 				best = total;
