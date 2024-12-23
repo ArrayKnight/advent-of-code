@@ -21,7 +21,7 @@ function getCombinations(values: string[]) {
 
 		const length = group.length;
 
-		if (length >= 3) {
+		if (length > 0) {
 			combosByLength[length] ??= [];
 			combosByLength[length].push({
 				group: group.join(),
