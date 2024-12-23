@@ -181,22 +181,6 @@ function count(
 }
 
 export default (codes: string[], depth: number) => {
-	GridUtils.forEach(numericKeypad, (a) => {
-		GridUtils.forEach(numericKeypad, (b) => {
-			if (a && b) {
-				findPath(numericKeypad, a, b);
-			}
-		});
-	});
-
-	GridUtils.forEach(directionalKeypad, (a) => {
-		GridUtils.forEach(directionalKeypad, (b) => {
-			if (a && b) {
-				findPath(directionalKeypad, a, b);
-			}
-		});
-	});
-
 	const cache = new Map<string, number>();
 
 	return codes.reduce(
