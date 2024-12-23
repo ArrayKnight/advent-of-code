@@ -1,21 +1,39 @@
 type Party = Map<string, Party>;
 
+type Combo = {
+	group: string;
+	length: number;
+};
+
 function getCombinations(values: string[]) {
-	const combinations: string[][] = [];
-	let temp: string[] = [];
+	const combinations: Combo[] = [];
+	const combosByLength: Combo[][] = new Array(values.length);
+	let group: string[] = [];
 
 	for (let i = 0; i < 2 ** values.length; i++) {
-		temp = [];
+		group = [];
 
 		for (let j = 0; j < values.length; j++) {
 			if (i & (2 ** j)) {
-				temp.push(values[j]);
+				group.push(values[j]);
 			}
 		}
 
-		if (temp.length >= 3) {
-			combinations.push(temp);
+		const length = group.length;
+
+		if (length >= 3) {
+			combosByLength[length] ??= [];
+			combosByLength[length].push({
+				group: group.join(),
+				length,
+			});
 		}
+	}
+
+	for (let i = values.length - 1; i >= 0; i--) {
+		if (!combosByLength[i]) continue;
+
+		combinations.push(...combosByLength[i]);
 	}
 
 	return combinations;
@@ -35,25 +53,36 @@ export default (connections: [string, string][]) => {
 		pB.set(a, pA);
 	}
 
-	const groups = new Map<string, number>();
-	let group = "";
-	let biggest = 0;
+	const combinations = new Map<string, Combo[]>();
+	let length = 0;
 
 	for (const [id, party] of parties) {
-		const combinations = getCombinations([id, ...party.keys()].sort());
+		const combos = getCombinations([id, ...party.keys()].sort());
 
-		for (const combination of combinations) {
-			const key = combination.join();
-			const size = (groups.get(key) ?? 0) + 1;
+		if (combos.length) {
+			length = Math.max(length, combos.length ?? 0);
 
-			groups.set(key, size);
-
-			if (size > biggest && size === combination.length) {
-				biggest = size;
-				group = key;
-			}
+			combinations.set(id, combos);
 		}
 	}
 
-	return group;
+	const groups = new Map<string, number>();
+
+	for (let i = 0; i < length; i++) {
+		for (const [, combos] of combinations) {
+			const combo = combos[i];
+
+			if (!combo) continue;
+
+			const { group, length } = combo;
+
+			const size = (groups.get(group) ?? 0) + 1;
+
+			groups.set(group, size);
+
+			if (size === length) {
+				return group;
+			}
+		}
+	}
 };
