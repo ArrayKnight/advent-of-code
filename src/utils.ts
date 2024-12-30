@@ -1,5 +1,11 @@
 import type { CardinalDiagonal, Direction, Grid, Position } from "./types";
 
+export function assert(condition: unknown, msg?: string): asserts condition {
+	if (condition == null || condition === false) {
+		throw new Error(msg);
+	}
+}
+
 export const DirectionUtils = {
 	CW: {
 		N: "E",
