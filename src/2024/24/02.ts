@@ -1,4 +1,4 @@
-import { toId, getValue, type Input, operators, process, toNumber } from "./01";
+import { toId, getValue, type Input, process } from "./01";
 import { assert } from "../../utils";
 
 type Calculation = {
@@ -26,10 +26,6 @@ function parseId(value: string) {
 	};
 }
 
-function getBit(value: number[], index: number) {
-	return value[value.length - 1 - index];
-}
-
 type ValidatorInputs = {
 	calculation: Calculation;
 	calculationsByInput: Map<string, Calculation[]>;
@@ -37,13 +33,9 @@ type ValidatorInputs = {
 	incorrect: Set<string>;
 	index: number;
 	length: number;
-	values: Map<string, number>;
 	aId: string;
-	aValue: number;
 	bId: string;
-	bValue: number;
 	cId?: string;
-	cValue?: number;
 };
 type Validator = (inputs: ValidatorInputs) => string;
 
@@ -128,13 +120,11 @@ const validators: Record<string, Validator> = {
 			aId,
 			bId,
 			cId,
-			cValue,
 		} = inputs;
 
 		if (cId == null) return validators.HALF(inputs);
 
 		assert(cId);
-		assert(cValue);
 
 		const calculations = new Set<Calculation>([calculation]);
 		const ids = [aId, bId, cId, calculation.rId];
@@ -217,9 +207,7 @@ const validators: Record<string, Validator> = {
 	},
 };
 
-export default (input: Input) => {
-	const { outputs } = input;
-	const values = process(input);
+export default ({ inputs, outputs }: Input) => {
 	const calculationsByInput = new Map<string, Calculation[]>();
 	const calculationsByOperand = new Map<
 		string,
@@ -256,18 +244,14 @@ export default (input: Input) => {
 		calculationsByOperand.set(operand, opMap);
 	}
 
-	const xValue = getValue(values, "x");
-	const yValue = getValue(values, "y");
+	const xValue = getValue(inputs, "x");
 	const incorrect = new Set<string>();
 	const length = xValue.length;
 	let cId: string | undefined = undefined;
 
 	for (let i = 0; i < length; i++) {
 		const aId = toId("x", i);
-		const aValue = getBit(xValue, i);
 		const bId = toId("y", i);
-		const bValue = getBit(yValue, i);
-		const cValue = cId ? values.get(cId) : undefined;
 
 		// Would need to be more complex if more types of adders were supported
 		const AND = calculationsByOperand.get("AND")?.get(aId)?.get(bId);
@@ -286,13 +270,9 @@ export default (input: Input) => {
 			incorrect,
 			index: i,
 			length,
-			values,
 			aId,
-			aValue,
 			bId,
-			bValue,
 			cId,
-			cValue,
 		});
 	}
 

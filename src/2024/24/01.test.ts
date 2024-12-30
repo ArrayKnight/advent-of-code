@@ -6,16 +6,19 @@ function process(input: string) {
 	const [inputs, outputs] = input.split("\n\n");
 
 	return {
-		inputs: inputs.split("\n").map((line) => {
-			const [key, value] = line.split(": ");
+		inputs: Object.fromEntries(
+			inputs.split("\n").map((line) => {
+				const [key, value] = line.split(": ");
 
-			return [key, Number(value)];
-		}),
+				return [key, Number(value)] as [string, number];
+			}),
+		),
 		outputs: outputs.split("\n").map((line) => {
 			const [condition, output] = line.split(" -> ");
+			const [aId, operand, bId] = condition.split(" ");
 
 			return {
-				condition: condition.split(" "),
+				condition: [aId, operand, bId] as [string, string, string],
 				output,
 			};
 		}),

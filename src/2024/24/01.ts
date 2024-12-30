@@ -1,5 +1,5 @@
 export type Input = {
-	inputs: [string, number][];
+	inputs: Record<string, number>;
 	outputs: {
 		condition: [string, string, string];
 		output: string;
@@ -30,7 +30,7 @@ export function toId(base: string, index: number) {
 	return `${base}${num}`;
 }
 
-export function getValue(values: Map<string, number>, base: string) {
+export function getValue(values: Record<string, number>, base: string) {
 	let i = 0;
 	let key: string;
 	const binary: number[] = [];
@@ -38,9 +38,9 @@ export function getValue(values: Map<string, number>, base: string) {
 	while (
 		// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
 		(key = toId(base, i)) &&
-		values.has(key)
+		Object.hasOwn(values, key)
 	) {
-		binary.unshift(values.get(key) ?? Number.NaN);
+		binary.unshift(values[key] ?? Number.NaN);
 		i++;
 	}
 
@@ -48,7 +48,7 @@ export function getValue(values: Map<string, number>, base: string) {
 }
 
 export function process({ inputs, outputs }: Input) {
-	const values = new Map(inputs);
+	const values: Record<string, number> = { ...inputs };
 
 	const processing = outputs.slice();
 
@@ -58,8 +58,8 @@ export function process({ inputs, outputs }: Input) {
 		if (!output) break;
 
 		const [a, operand, b] = output.condition;
-		const vA = values.get(a);
-		const vB = values.get(b);
+		const vA = values[a];
+		const vB = values[b];
 
 		if (vA === undefined || vB === undefined) {
 			processing.push(output);
@@ -67,7 +67,7 @@ export function process({ inputs, outputs }: Input) {
 			continue;
 		}
 
-		values.set(output.output, operators[operand](vA, vB));
+		values[output.output] = operators[operand](vA, vB);
 	}
 
 	return values;
